@@ -1,6 +1,5 @@
-package Repositorio;
+package Contenedoras;
 
-import Contenedoras.GestionDeElementos;
 import Excepciones.ElementoNoExiste;
 import Excepciones.ElementoRepetido;
 import Excepciones.VerificarNulo;
@@ -8,7 +7,7 @@ import Models.Pelicula;
 import org.json.JSONArray;
 
 public class RepositorioPelicula {
-    private GestionDeElementos<Pelicula>peliculaGestionDeElementos;
+    private GestionDeElementos<Pelicula> peliculaGestionDeElementos;
     private JSONArray j;
     public RepositorioPelicula() {
         this.peliculaGestionDeElementos = new GestionDeElementos<>();
