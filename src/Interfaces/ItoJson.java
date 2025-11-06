@@ -1,5 +1,7 @@
 package Interfaces;
 
-public interface ItoJson {
+import org.json.JSONObject;
 
+public interface ItoJson {
+    JSONObject toJson ();
 }

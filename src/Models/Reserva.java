@@ -2,13 +2,14 @@ package Models;
 
 import java.time.LocalDate;
 
-public class Reserva {
+public class Reserva  {
     private int idReserva;
     private boolean estadoReserva;
     private int numAsiento;
     private LocalDate fechaReserva;
     private boolean pagado;
     private Funcion funcion;
+
     public Reserva(Funcion funcion, boolean estadoReserva, LocalDate fechaReserva, int idReserva, int numAsiento, boolean pagado) {
         this.estadoReserva = estadoReserva;
         this.fechaReserva = fechaReserva;
