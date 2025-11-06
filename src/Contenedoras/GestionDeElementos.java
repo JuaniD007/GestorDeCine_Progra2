@@ -21,8 +21,6 @@ public class GestionDeElementos<T>
     }
 
 
-
-
     public boolean agregarElemento(T objeto) throws VerificarNulo, ElementoRepetido
     {
         if (objeto == null) {
