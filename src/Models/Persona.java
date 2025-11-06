@@ -6,13 +6,14 @@ public abstract class Persona
 {
     protected String nombre;
     protected String dni;
-    protected String edad;
+    protected int edad;
 
-    public Persona(String nombre, String dni, String edad) {
+    public Persona(String nombre, String dni, int edad) {
         this.nombre = nombre;
         this.dni = dni;
         this.edad = edad;
     }
+    public Persona(){}
 
     public String getNombre() {
         return nombre;
@@ -30,11 +31,11 @@ public abstract class Persona
         this.dni = dni;
     }
 
-    public String getEdad() {
+    public int getEdad() {
         return edad;
     }
 
-    public void setEdad(String edad) {
+    public void setEdad(int edad) {
         this.edad = edad;
     }
 
@@ -57,4 +58,5 @@ public abstract class Persona
                 ", edad='" + edad + '\'' +
                 '}';
     }
+
 }

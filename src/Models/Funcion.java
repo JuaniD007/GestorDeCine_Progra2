@@ -12,13 +12,13 @@ public class Funcion   {
     private LocalDate horario;
     private HashMap <Integer, Cliente> butacaOcupadas;
 
-    public Funcion(HashMap<Integer, Cliente> butacaOcupadas, LocalDate horario, Pelicula pelicula, Sala sala) {
-        this.butacaOcupadas = butacaOcupadas;
+    public Funcion( LocalDate horario, Pelicula pelicula, Sala sala) {
+        this.butacaOcupadas = new HashMap<>();
         this.horario = horario;
         this.pelicula = pelicula;
         this.sala = sala;
     }
-
+    public Funcion(){}
     public HashMap<Integer, Cliente> isButacaOcupadas() {
         return butacaOcupadas;
     }

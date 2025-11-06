@@ -12,14 +12,14 @@ public class Sala
     private ArrayList <Funcion> funcionesDelDia;
 
 
-    public Sala(int capacidadTotal, boolean es3D, ArrayList<Funcion> funcionesDelDia, String idFuncion, int numSala) {
+    public Sala(int capacidadTotal, boolean es3D, String idFuncion, int numSala) {
         this.capacidadTotal = capacidadTotal;
         this.es3D = es3D;
-        this.funcionesDelDia = funcionesDelDia;
+        this.funcionesDelDia = new ArrayList<>();
         this.idFuncion = idFuncion;
         this.numSala = numSala;
     }
-
+    public Sala (){}
     public int getCapacidadTotal() {
         return capacidadTotal;
     }
