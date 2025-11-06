@@ -1,5 +1,8 @@
 package Models;
 import Enum.Genero;
+
+import java.util.Objects;
+
 public class Pelicula {
 
     private int idPelicula;
@@ -54,6 +57,17 @@ public class Pelicula {
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Pelicula pelicula)) return false;
+        return idPelicula == pelicula.idPelicula;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(idPelicula);
     }
 
     @Override
