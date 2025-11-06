@@ -1,12 +1,13 @@
 package Models;
 import Enum.EnumDepartamento;
 
-public class Empleado {
+public class Empleado extends Persona{
     private int idEmpleado;
     private double SalarioEmpleado;
     private EnumDepartamento enumDepartamento;
 
-    public Empleado(EnumDepartamento enumDepartamento, int idEmpleado, double salarioEmpleado) {
+    public Empleado(String nombre, String dni, String edad,EnumDepartamento enumDepartamento, int idEmpleado, double salarioEmpleado) {
+        super(nombre, dni, edad);
         this.enumDepartamento = enumDepartamento;
         this.idEmpleado = idEmpleado;
         SalarioEmpleado = salarioEmpleado;
@@ -38,7 +39,7 @@ public class Empleado {
 
     @Override
     public String toString() {
-        return "Empleado{" +
+        return "Empleado{"+ super.toString() +
                 "enumDepartamento=" + enumDepartamento +
                 ", idEmpleado=" + idEmpleado +
                 ", SalarioEmpleado=" + SalarioEmpleado +

@@ -1,6 +1,4 @@
-package Interfaces;
-
-import Models.Funcion;
+package Models;
 
 import java.time.LocalDate;
 

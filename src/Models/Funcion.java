@@ -1,10 +1,12 @@
 package Models;
 
+import Interfaces.IPagable;
+
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class Funcion {
+public class Funcion   {
     private Pelicula pelicula;
     private Sala sala;
     private LocalDate horario;
@@ -48,6 +50,8 @@ public class Funcion {
     public void setSala(Sala sala) {
         this.sala = sala;
     }
+
+
 
     @Override
     public String toString() {
