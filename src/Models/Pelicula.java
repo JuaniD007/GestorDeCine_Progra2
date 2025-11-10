@@ -111,7 +111,7 @@ public class Pelicula implements ItoJson {
                 p.setGenero(Genero.valueOf(generoStr));
             }
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return p;
     }

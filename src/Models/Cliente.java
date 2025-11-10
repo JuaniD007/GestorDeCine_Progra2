@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class Cliente  extends Usuario implements ItoJson {
-    private int idCliente; /// LO SACARIA Y HARIA SOLO ID USUARIO GENERADO AUTOM.
+
     private int puntosPorCompraVisita;
     private ArrayList<Reserva> reservaArrayList;
 
@@ -22,13 +22,8 @@ public class Cliente  extends Usuario implements ItoJson {
     public Cliente(){
         super("","",0,"");
     }
-    public int getIdCliente() {
-        return idCliente;
-    }
 
-    public void setIdCliente(int idCliente) {
-        this.idCliente = idCliente;
-    }
+
 
     public int getPuntosPorCompraVisita() {
         return puntosPorCompraVisita;
@@ -49,23 +44,12 @@ public class Cliente  extends Usuario implements ItoJson {
     @Override
     public String toString() {
         return "Cliente{" + super.toString() +
-                "idCliente=" + idCliente +
+                "idCliente=" +
                 ", puntosPorCompraVisita=" + puntosPorCompraVisita +
                 ", reservaArrayList=" + reservaArrayList +
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Cliente cliente)) return false;
-        if (!super.equals(o)) return false;
-        return idCliente == cliente.idCliente;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(super.hashCode(), idCliente);
-    }
 
     public boolean agregarReserva (Reserva r){
         return reservaArrayList.add(r);
@@ -78,47 +62,65 @@ public class Cliente  extends Usuario implements ItoJson {
         return puntosPorCompraVisita;
     }
 
-    public JSONObject toJson (){
-        JSONObject j = new JSONObject();
-        JSONArray arreglo = new JSONArray();
-        try {
-            j.put("id cliente", this.idCliente);
-            j.put("puntos por compra o visita", this.puntosPorCompraVisita);
-            j.put("dni", this.dni);
-            j.put("edad", this.edad);
-            j.put("nombre", this.nombre);
-            for (Reserva reserva : reservaArrayList){
-              //  arreglo.put(reserva.);
-            }
+    @Override
+    public JSONObject toJson() {
+        // 1. Llama al padre (Usuario) para obtener el JSON base
+        JSONObject j = super.toJson();
 
+        // 2. Agrega solo los campos de Cliente
+        try {
+            j.put("puntosPorCompraVisita", this.puntosPorCompraVisita);
+
+            // 3. Maneja el Arreglo de Reservas
+            JSONArray arregloReservas = new JSONArray();
+            if (this.reservaArrayList != null) {
+                for (Reserva reserva : this.reservaArrayList) {
+                    // Asumimos que Reserva tiene su propio método toJson()
+                    arregloReservas.put(reserva.toJson());
+                }
+            }
+            j.put("reservas", arregloReservas); // Le damos una clave al arreglo
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        return j ;
+        return j;
     }
 
-    public static Cliente traerJSon (JSONObject o ){
-        Cliente p = new Cliente();
-        try{
-            p.setDni(o.getString("dni"));
-            p.setEdad(o.getInt("edad"));
-            p.setNombre(o.getString("nombre"));
-            p.setIdCliente(o.getInt("idCliente"));
-            p.setPuntosPorCompraVisita(o.getInt("puntos Por compra o visita"));
-            JSONArray array =o.getJSONArray("RESERVA: ");
+    public static Cliente traerJSon(JSONObject o) {
+        // 1. Crea la instancia vacía
+        Cliente c = new Cliente();
 
-            for (int i =0; i<array.length();i++){
+        // 2. Llama al helper ESTÁTICO de Usuario para rellenar
+        //    los campos base (id, nombre, dni, edad, email)
+        Usuario.traerDesdeJson(c, o);
 
-                JSONObject obj = array.getJSONObject(i);
-             //   Reserva r = Reserva.traerJSon(obj);       RESERVA NECESITA METODO TOJSON :|
-             //   curso.agregar(a);
+        // 3. Lee solo los campos de Cliente
+        try {
+            // El helper de Usuario ya se encargó de id, nombre, dni, etc.
+
+            c.setPuntosPorCompraVisita(o.getInt("puntosPorCompraVisita")); // Usamos la clave del toJson()
+
+            // 4. Maneja el Arreglo de Reservas
+            // Nota: 'setReservaArrayList' no es necesario si inicializas en el constructor
+            // c.setReservaArrayList(new ArrayList<>());
+
+            JSONArray arrayReservas = o.getJSONArray("reservas"); // Usamos la clave del toJson()
+
+            for (int i = 0; i < arrayReservas.length(); i++) {
+                JSONObject objReserva = arrayReservas.getJSONObject(i);
+
+                // Asumimos que Reserva tiene su propio método estático 'traerJSon'
+                // Reserva r = Reserva.traerJSon(objReserva);
+                // c.agregarReserva(r);
             }
 
         } catch (JSONException e) {
             throw new RuntimeException(e);
         }
-        return p;
+
+        // 5. Retorna el cliente completo
+        return c;
     }
         
 }
