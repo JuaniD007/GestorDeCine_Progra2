@@ -8,19 +8,19 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Cliente  extends Persona implements ItoJson {
-    private int idCliente;
+public class Cliente  extends Usuario implements ItoJson {
+    private int idCliente; /// LO SACARIA Y HARIA SOLO ID USUARIO GENERADO AUTOM.
     private int puntosPorCompraVisita;
     private ArrayList<Reserva> reservaArrayList;
 
-    public Cliente(String nombre, String dni, int edad,int idCliente, int puntosPorCompraVisita) {
-        super(nombre, dni, edad);
-        this.idCliente = idCliente;
-        this.puntosPorCompraVisita = puntosPorCompraVisita;
-        this.reservaArrayList = new ArrayList<>();
+
+    public Cliente(String nombre, String dni, int edad, String email) {
+        super(nombre, dni, edad, email);
+        this.puntosPorCompraVisita = 0;
     }
+
     public Cliente(){
-        super("", "", 0);
+        super("","",0,"");
     }
     public int getIdCliente() {
         return idCliente;
