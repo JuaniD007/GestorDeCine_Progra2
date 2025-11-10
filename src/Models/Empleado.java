@@ -1,24 +1,27 @@
 package Models;
 import Enum.EnumDepartamento;
 import Interfaces.ItoJson;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Empleado extends Persona implements ItoJson {
-    private int idEmpleado;
+public class Empleado extends Usuario implements ItoJson {
+    private int idEmpleado; /// LO SACARIA Y HARIA SOLO ID USUARIO GENERADO AUTOM.
     private double SalarioEmpleado;
     private EnumDepartamento enumDepartamento;
 
-    public Empleado(String nombre, String dni, int edad,EnumDepartamento enumDepartamento, int idEmpleado, double salarioEmpleado) {
-        super(nombre, dni, edad);
-        this.enumDepartamento = enumDepartamento;
-        this.idEmpleado = idEmpleado;
-        SalarioEmpleado = salarioEmpleado;
+
+    public Empleado(String nombre, String dni, int edad, String email) {
+        super(nombre, dni, edad, email);
+        this.idEmpleado = 0;
+        this.SalarioEmpleado = 0.0;
+        this.enumDepartamento = null; // o EnumDepartamento.DEFAULT
     }
+
+
     public Empleado (){
-        super("", "", 0);
+        super("", "", 0,"");
     }
+
     public EnumDepartamento getEnumDepartamento() {
         return enumDepartamento;
     }
@@ -45,12 +48,14 @@ public class Empleado extends Persona implements ItoJson {
 
     @Override
     public String toString() {
-        return "Empleado{"+ super.toString() +
-                "enumDepartamento=" + enumDepartamento +
-                ", idEmpleado=" + idEmpleado +
+        return "Empleado{" +
+                super.toString() +
+                "idEmpleado=" + idEmpleado +
                 ", SalarioEmpleado=" + SalarioEmpleado +
+                ", enumDepartamento=" + enumDepartamento +
                 '}';
     }
+
     public JSONObject toJson (){
         JSONObject j = new JSONObject();
         try {
