@@ -8,8 +8,7 @@ import Models.Pelicula;
 
 import java.util.ArrayList;
 
-public class GestionDeElementos<T>
-{
+public class GestionDeElementos<T> {
     private ArrayList<T> elementos;
 
     public GestionDeElementos() {
@@ -21,19 +20,16 @@ public class GestionDeElementos<T>
     }
 
 
-    public boolean agregarElemento(T objeto) throws VerificarNulo, ElementoRepetido
-    {
+    public boolean agregarElemento(T objeto) throws VerificarNulo, ElementoRepetido {
         if (objeto == null) {
             throw new VerificarNulo("El objeto a agregar es nulo. No se puede añadir a la colección");
         }
 
         int idDelObjeto = -1;
 
-        if (objeto instanceof Cliente cliente)
-        {
+        if (objeto instanceof Cliente cliente) {
             idDelObjeto = cliente.getIdCliente();
-        } else if (objeto instanceof Pelicula pelicula)
-        {
+        } else if (objeto instanceof Pelicula pelicula) {
             idDelObjeto = pelicula.getIdPelicula();
         }
 
@@ -45,8 +41,7 @@ public class GestionDeElementos<T>
 
                 throw new ElementoRepetido("Error: Ya existe un elemento con ID " + idDelObjeto + " No se agrega");
 
-            } catch (ElementoNoExiste e)
-            {
+            } catch (ElementoNoExiste e) {
                 e.getMessage();
             } catch (VerificarNulo e) {
                 throw new VerificarNulo("Error interno: La coleccion es nula.No se pudo validar");
@@ -59,18 +54,14 @@ public class GestionDeElementos<T>
     }
 
 
-
-
-    public T buscarElemento(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido
-    {
+    public T buscarElemento(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         if (this.elementos == null) {
             throw new VerificarNulo("La colección de elementos es nula y no se puede buscar");
         }
         T elementoBuscar = null;
         int contador = 0;
 
-        for (T buscado: this.elementos)
-        {
+        for (T buscado : this.elementos) {
             boolean encontrado = false;
 
             if (buscado instanceof Cliente cliente) {
@@ -79,8 +70,7 @@ public class GestionDeElementos<T>
                 }
             }
 
-            if (buscado instanceof Pelicula pelicula)
-            {
+            if (buscado instanceof Pelicula pelicula) {
                 if (pelicula.getIdPelicula() == id) {
                     encontrado = true;
                 }
@@ -101,8 +91,7 @@ public class GestionDeElementos<T>
                     " elementos con el ID " + id + " Los IDs deben ser únicos");
         }
 
-        if (elementoBuscar == null)
-        {
+        if (elementoBuscar == null) {
             throw new ElementoNoExiste("El elemento que se intento buscar no existe");
         }
 
@@ -110,8 +99,7 @@ public class GestionDeElementos<T>
     }
 
 
-    public boolean eliminarElemento(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido
-    {
+    public boolean eliminarElemento(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         T elementoAEliminar = null;
 
         try {
