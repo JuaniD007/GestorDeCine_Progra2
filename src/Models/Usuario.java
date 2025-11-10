@@ -1,9 +1,13 @@
 package Models;
 
+import Interfaces.ItoJson;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class Usuario {
+public abstract class Usuario implements ItoJson {
     protected String id;
     protected String nombre;
     protected String dni;
@@ -17,6 +21,7 @@ public abstract class Usuario {
         this.edad = edad;
         this.email = email;
     }
+
 
     public Usuario() { this.nombre = ""; this.dni = ""; this.edad = 0; }
 
@@ -48,18 +53,11 @@ public abstract class Usuario {
 
     public String getEmail() {return email;}
 
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public void setEmail(String email) {this.email = email;}
-
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Usuario usuario)) return false;
-        return Objects.equals(dni, usuario.dni);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(dni);
-    }
 
     @Override
     public String toString() {
@@ -71,4 +69,53 @@ public abstract class Usuario {
                 ", email='" + email + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Usuario usuario)) return false;
+        return Objects.equals(id, usuario.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(id);
+    }
+
+    @Override
+    public JSONObject toJson() {
+
+            JSONObject jsonObject = new JSONObject();
+
+            try {
+
+                jsonObject.put("id", id);
+                jsonObject.put("nombre", nombre);
+                jsonObject.put("dni", dni);
+                jsonObject.put("edad", edad);
+                jsonObject.put("email", email);
+            }catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        return jsonObject;
+    }
+
+
+   public  static Usuario traerDesdeJson (Usuario u, JSONObject o ) {
+
+
+       try{
+       u.setId(o.getString("id"));
+       u.setNombre(o.getString("nombre"));
+       u.setDni(o.getString("dni"));
+       u.setEdad(o.getInt("edad"));
+       u.setEmail(o.getString("email"));
+       } catch (JSONException e) {
+          e.printStackTrace();
+       }
+       return u;
+
+
+   }
+
 }

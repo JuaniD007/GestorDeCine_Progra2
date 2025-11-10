@@ -1,8 +1,11 @@
 package Models;
 
+import Interfaces.ItoJson;
+import org.json.JSONObject;
+
 import java.time.LocalDate;
 
-public class Reserva  {
+public class Reserva  implements ItoJson {
     private int idReserva;
     private boolean estadoReserva;
     private int numAsiento;
@@ -85,4 +88,8 @@ public class Reserva  {
                 "Estado: " + (estadoReserva ? "Activa" : "Cancelada");
     }
 
+    @Override
+    public JSONObject toJson() {
+        return null;
+    }
 }
