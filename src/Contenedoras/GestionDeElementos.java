@@ -25,15 +25,15 @@ public class GestionDeElementos<T> {
             throw new VerificarNulo("El objeto a agregar es nulo. No se puede añadir a la colección");
         }
 
-        int idDelObjeto = -1;
+        String idDelObjeto = null;
 
         if (objeto instanceof Cliente cliente) {
-            idDelObjeto = cliente.getIdCliente();
+            idDelObjeto = cliente.getId();
         } else if (objeto instanceof Pelicula pelicula) {
             idDelObjeto = pelicula.getIdPelicula();
         }
 
-        if (idDelObjeto != -1) {
+        if (idDelObjeto != null) {
             try {
 
                 T elementoExistente = buscarElemento(idDelObjeto);
@@ -54,7 +54,7 @@ public class GestionDeElementos<T> {
     }
 
 
-    public T buscarElemento(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+    public T buscarElemento(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         if (this.elementos == null) {
             throw new VerificarNulo("La colección de elementos es nula y no se puede buscar");
         }
@@ -65,13 +65,13 @@ public class GestionDeElementos<T> {
             boolean encontrado = false;
 
             if (buscado instanceof Cliente cliente) {
-                if (cliente.getIdCliente() == id) {
+                if (cliente.getId().equals(id)) {
                     encontrado = true;
                 }
             }
 
             if (buscado instanceof Pelicula pelicula) {
-                if (pelicula.getIdPelicula() == id) {
+                if (pelicula.getIdPelicula().equals(id)) {
                     encontrado = true;
                 }
             }
@@ -79,7 +79,7 @@ public class GestionDeElementos<T> {
             if (encontrado) {
                 if (elementoBuscar == null) {
                     elementoBuscar = buscado;
-                    contador++;
+
                 } else {
                     contador++;
                 }
@@ -99,7 +99,7 @@ public class GestionDeElementos<T> {
     }
 
 
-    public boolean eliminarElemento(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+    public boolean eliminarElemento(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         T elementoAEliminar = null;
 
         try {
@@ -114,11 +114,7 @@ public class GestionDeElementos<T> {
 
         boolean eliminado = this.elementos.remove(elementoAEliminar);
 
-        if (eliminado) {
-            return true;
-        } else {
-            return false;
-        }
+        return eliminado;
     }
 
 

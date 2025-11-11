@@ -8,13 +8,13 @@ import java.util.Objects;
 
 public class Pelicula implements ItoJson {
 
-    private int idPelicula;
+    private String idPelicula;
     private  String titulo;
     private Genero genero;
     private int duracion;
     private double precioBase;
 
-    public Pelicula(int duracion, Genero genero, int idPelicula, double precioBase, String titulo) {
+    public Pelicula(int duracion, Genero genero, String idPelicula, double precioBase, String titulo) {
         this.duracion = duracion;
         this.genero = genero;
         this.idPelicula = idPelicula;
@@ -38,11 +38,11 @@ public class Pelicula implements ItoJson {
         this.genero = genero;
     }
 
-    public int getIdPelicula() {
+    public String getIdPelicula() {
         return idPelicula;
     }
 
-    public void setIdPelicula(int idPelicula) {
+    public void setIdPelicula(String idPelicula) {
         this.idPelicula = idPelicula;
     }
 
@@ -104,7 +104,7 @@ public class Pelicula implements ItoJson {
         try{
             p.setPrecioBase(o.getDouble("precio base"));
             p.setDuracion(o.getInt("duracion"));
-            p.setIdPelicula(o.getInt("idPelicula"));
+            p.setIdPelicula(o.getString("idPelicula"));
             p.setTitulo(o.getString("titulo"));
             if (o.has("genero")) { // si json tiene una clave llamada genero /o.has("genero") devuelve true.
                 String generoStr = o.getString("genero").toUpperCase(); // Toma el valor de la clave "genero" como texto, y lo pasa a mayúsculas.

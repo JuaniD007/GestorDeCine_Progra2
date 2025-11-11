@@ -1,101 +1,98 @@
 package Contenedoras;
 
 import Models.Usuario;
-
 import Models.Cliente;
 import Models.Empleado;
 
-import java.util.Scanner;
 import java.util.regex.Pattern;
+// Se elimina la importación de Scanner ya que no se usa para leer entrada
+// en esta versión refactorizada de la clase de lógica.
 
 public class GestorUsuario {
     // Repositorio genérico para almacenar usuarios (Cliente o Empleado)
     private RepositorioUsuario<Usuario> repoUsuario = new RepositorioUsuario<>();
 
-
     /**
-     * Método para crear un usuario (Cliente o Empleado) según el tipo indicado.
-     * Realiza validaciones para nombre, DNI, edad y email antes de crear el objeto.
+     * Método para crear un usuario (Cliente o Empleado) según el tipo indicado,
+     * realizando validaciones.
+     *
+     * @param tipo El tipo de usuario a crear ("Cliente" o "Empleado").
+     * @param nombre Nombre del usuario.
+     * @param dni DNI del usuario.
+     * @param edadStr Edad del usuario como String (para manejo de errores de formato).
+     * @param email Email del usuario.
+     * @return String que contiene el mensaje de éxito (con el usuario) o el mensaje de error de validación/adición.
      */
+    public String crearUsuario(String tipo, String nombre, String dni, String edadStr, String email) {
+        // --- 1. VALIDACIONES DE ENTRADA ---
 
-    private void crearUsuario(String tipo) {
-        Scanner sc = new Scanner(System.in);
-
-        // Validar nombre
-        System.out.print("Ingrese nombre: ");
-        String nombre = sc.nextLine().trim(); // trim() elimina espacios al inicio y final
-        if (nombre.isEmpty()) {
-            System.out.println("El nombre no puede estar vacío.");
-            return;
+        // Validación de nombre
+        if (nombre == null || nombre.trim().isEmpty()) {
+            return "El nombre no puede estar vacío.";
         }
+        nombre = nombre.trim();
 
-        // Validar DNI
-        System.out.print("Ingrese DNI: ");
-        String dni = sc.nextLine().trim();
-        // Verifica que no esté vacío y que solo contenga números usando regex
-        if (dni.isEmpty() || !dni.matches("\\d+")) {
-            System.out.println("DNI inválido. Debe ser numérico y no vacío.");
-            return;
+        // Validación de DNI
+        if (dni == null || dni.trim().isEmpty() || !dni.trim().matches("\\d+")) {
+            return "DNI inválido. Debe ser numérico y no vacío.";
         }
+        dni = dni.trim();
 
-        // Validar edad
-        System.out.print("Ingrese edad: ");
+        // Validación de edad
         int edad;
         try {
-            edad = Integer.parseInt(sc.nextLine().trim());
+            edad = Integer.parseInt(edadStr.trim());
         } catch (NumberFormatException e) {
-            System.out.println("Edad inválida. Debe ser un número.");
-            return;
+            return "Edad inválida. Debe ser un número entero.";
         }
         if (edad < 18 || edad > 90) {
-            System.out.println("Edad inválida. Debe estar entre 18 y 90.");
-            return;
+            return "Edad inválida. Debe estar entre 18 y 90 años.";
         }
 
-        // Validar email
-        System.out.print("Ingrese email: ");
-        String email = sc.nextLine().trim();
+        // Validación de email
+        email = email.trim();
         if (!esEmailValido(email)) {
-            System.out.println("Email inválido.");
-            return;
+            return "Email inválido. Verifique el formato.";
         }
 
 
-        // === CREACIÓN DEL USUARIO ===
-        // Según el tipo (Cliente o Empleado), instancia la clase correspondiente
+        // --- 2. CREACIÓN DEL OBJETO Y ASIGNACIÓN DE ID (Implícito) ---
+        // El ID se genera dentro del constructor de Cliente/Empleado (o Usuario)
+        Usuario usuario;
+        String tipoAñadido;
 
-        Usuario usuario = tipo.equalsIgnoreCase("Cliente") ?
-                new Cliente(nombre, dni, edad, email) :
-                new Empleado(nombre, dni, edad, email);
+        if (tipo != null && tipo.equalsIgnoreCase("Cliente")) {
+            usuario = new Cliente(nombre, dni, edad, email);
+            tipoAñadido = "Cliente";
+        } else {
+            usuario = new Empleado(nombre, dni, edad, email);
+            tipoAñadido = "Empleado";
+        }
 
-        // Agregar al repositorio
+        // --- 3. AGREGAR AL REPOSITORIO ---
         try {
-            // Llama al método del repositorio que valida duplicados y agrega el usuario
+            // Llama al método del repositorio que valida duplicados (ej. por DNI) y agrega el usuario.
             if (repoUsuario.verificarUsuario(usuario)) {
-                System.out.println(tipo + " agregado correctamente: " + usuario);
+                // El toString() de 'usuario' debe incluir el ID generado automáticamente.
+                return tipoAñadido + " agregado correctamente: " + usuario.toString();
+            } else {
+                // Caso alternativo si verificarUsuario retorna false sin lanzar excepción
+                return "Error desconocido al intentar agregar " + tipoAñadido + ".";
             }
         } catch (Exception e) {
-            System.out.println("Error al agregar usuario: " + e.getMessage());
+            // Captura excepciones lanzadas por el repositorio (ej. DNI duplicado)
+            return "Error al agregar usuario: " + e.getMessage();
         }
     }
 
 
     /**
-     * Método auxiliar para validar email usando expresión regular.
+     * Método auxiliar estático para validar email usando expresión regular.
      * Retorna true si el email cumple el patrón, false si no.
      */
-
-    private boolean esEmailValido(String email) {
+    private static boolean esEmailValido(String email) {
+        // Expresión regular para validar emails
         String regex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$";
         return Pattern.matches(regex, email);
     }
-
-    /*^ → inicio de la cadena.
-    [\\w.-]+ → uno o más caracteres alfanuméricos (\w), puntos (.) o guiones (-) → esto es la parte antes del @.
-    @ → símbolo arroba obligatorio.
-    [\\w.-]+ → uno o más caracteres válidos para el dominio.
-    \\. → punto literal antes de la extensión.
-    [a-zA-Z]{2,} → al menos 2 letras (ej. .com, .ar, .org).
-    $ → fin de la cadena.*/
-
 }

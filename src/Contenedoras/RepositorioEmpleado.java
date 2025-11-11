@@ -22,11 +22,11 @@ public class RepositorioEmpleado
         return this.empleadosGestionDeElementos.agregarElemento(empleado);
     }
 
-    public Empleado buscar(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+    public Empleado buscar(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         return this.empleadosGestionDeElementos.buscarElemento(id);
     }
 
-    public boolean eliminar(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+    public boolean eliminar(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         return this.empleadosGestionDeElementos.eliminarElemento(id);
     }
 

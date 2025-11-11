@@ -23,11 +23,11 @@ public class RepositorioCliente {
         return this.clientesGestionDeElementos.agregarElemento(cliente);
     }
 
-    public Cliente buscar(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+    public Cliente buscar(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         return this.clientesGestionDeElementos.buscarElemento(id);
     }
 
-    public boolean eliminar(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+    public boolean eliminar(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         return this.clientesGestionDeElementos.eliminarElemento(id);
     }
     public JSONArray toJson() {

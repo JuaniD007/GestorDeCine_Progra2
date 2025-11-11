@@ -18,10 +18,10 @@ public class RepositorioPelicula {
         return this.peliculaGestionDeElementos.agregarElemento(p);
     }
 
-    public boolean EliminarPelicula ( int id) throws  VerificarNulo, ElementoRepetido, ElementoNoExiste {
+    public boolean EliminarPelicula ( String id) throws  VerificarNulo, ElementoRepetido, ElementoNoExiste {
         return peliculaGestionDeElementos.eliminarElemento(id);
     }
-    public Pelicula buscarElemento(int id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido{
+    public Pelicula buscarElemento(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido{
         return peliculaGestionDeElementos.buscarElemento(id);
     }
 
