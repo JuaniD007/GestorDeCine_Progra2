@@ -101,7 +101,7 @@ public abstract class Usuario implements ItoJson {
     }
 
 
-   public  static Usuario traerDesdeJson (Usuario u, JSONObject o ) {
+   public static Usuario traerDesdeJson (Usuario u, JSONObject o) {
 
 
        try{
