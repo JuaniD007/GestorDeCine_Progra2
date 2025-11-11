@@ -25,7 +25,7 @@ public class RepositorioPelicula {
         return peliculaGestionDeElementos.buscarElemento(id);
     }
 
-    public JSONArray toJson() {
+    public JSONArray ArregloDePeliculas() {
         JSONArray jsonArray = new JSONArray();
 
         for (Pelicula pelicula : this.peliculaGestionDeElementos.getElementos()) { // Recorre una por una todas las películas que están guardadas dentro de tu GestionDeElementos.

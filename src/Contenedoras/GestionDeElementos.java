@@ -5,6 +5,7 @@ import Excepciones.ElementoRepetido;
 import Excepciones.VerificarNulo;
 import Models.Cliente;
 import Models.Pelicula;
+import Models.Usuario;
 
 import java.util.ArrayList;
 
@@ -27,8 +28,8 @@ public class GestionDeElementos<T> {
 
         String idDelObjeto = null;
 
-        if (objeto instanceof Cliente cliente) {
-            idDelObjeto = cliente.getId();
+        if (objeto instanceof Usuario usuario) {
+            idDelObjeto = usuario.getId();
         } else if (objeto instanceof Pelicula pelicula) {
             idDelObjeto = pelicula.getIdPelicula();
         }
@@ -64,8 +65,8 @@ public class GestionDeElementos<T> {
         for (T buscado : this.elementos) {
             boolean encontrado = false;
 
-            if (buscado instanceof Cliente cliente) {
-                if (cliente.getId().equals(id)) {
+            if (buscado instanceof Usuario usuario) {
+                if (usuario.getId().equals(id)) {
                     encontrado = true;
                 }
             }

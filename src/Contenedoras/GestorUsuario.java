@@ -72,7 +72,7 @@ public class GestorUsuario {
         // --- 3. AGREGAR AL REPOSITORIO ---
         try {
             // Llama al método del repositorio que valida duplicados (ej. por DNI) y agrega el usuario.
-            if (repoUsuario.verificarUsuario(usuario)) {
+            if (repoUsuario.agregarUsuario(usuario)) {
                 // El toString() de 'usuario' debe incluir el ID generado automáticamente.
                 return tipoAñadido + " agregado correctamente: " + usuario.toString();
             } else {

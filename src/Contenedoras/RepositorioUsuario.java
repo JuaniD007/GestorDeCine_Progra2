@@ -4,15 +4,22 @@ import Excepciones.ElementoRepetido;
 import Excepciones.VerificarNulo;
 import Interfaces.ItoJson;
 import Models.Usuario;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 
 public class RepositorioUsuario <T extends Usuario>   {
-    private HashMap<String, T> usuarios = new HashMap<>();
+    private HashMap<String, T> usuarios ;
+    private JSONArray jsonArrayUsuario ;
+    private GestionDeElementos<Usuario> gestorUsuario;
 
-    public boolean verificarUsuario (T usuario) throws VerificarNulo, ElementoRepetido {
+    public RepositorioUsuario() {
+        this.jsonArrayUsuario = new JSONArray();
+    }
+
+    public boolean agregarUsuario (T usuario) throws VerificarNulo, ElementoRepetido {
         if (usuario == null) {
             throw new VerificarNulo("El usuario no puede ser nulo.");
         }
@@ -39,8 +46,12 @@ public class RepositorioUsuario <T extends Usuario>   {
 
     }
 
-
-
+    public JSONArray ArregloDeUsuario (){
+        for (Usuario u : this.gestorUsuario.getElementos()){
+            jsonArrayUsuario.put(u.toJson());
+        }
+        return jsonArrayUsuario;
+    }
 }
 
 
