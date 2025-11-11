@@ -54,7 +54,7 @@ public class Empleado extends Usuario implements ItoJson {
             j.put("salarioEmpleado", this.SalarioEmpleado);
             j.put("departamento", getEnumDepartamento().name());
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return j;
     }

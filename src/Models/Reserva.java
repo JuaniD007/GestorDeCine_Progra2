@@ -1,6 +1,8 @@
 package Models;
 
 import Interfaces.ItoJson;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.LocalDate;
@@ -89,7 +91,19 @@ public class Reserva  implements ItoJson {
     }
 
     @Override
-    public JSONObject toJson() { // hacerlo
-        return null;
-    }
+    public JSONObject toJson() {
+        JSONObject j = new JSONObject();
+        try {
+            j.put("idReserva", this.idReserva);
+            j.put("estadoReserva", this.estadoReserva);
+            j.put("Pagado", this.pagado);
+            j.put("fechaReserva", this.fechaReserva);
+            j.put("funcion", this.funcion);
+            j.put("numAsiento", this.numAsiento);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return j ;
+            }
 }

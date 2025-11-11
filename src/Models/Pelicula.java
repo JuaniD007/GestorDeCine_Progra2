@@ -94,7 +94,7 @@ public class Pelicula implements ItoJson {
             j.put("precio base", this.precioBase);
 
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+               e.printStackTrace();
         }
         return j ;
     }
