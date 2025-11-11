@@ -82,7 +82,7 @@ public class Cliente  extends Usuario implements ItoJson {
             j.put("reservas", arregloReservas); // Le damos una clave al arreglo
 
         } catch (JSONException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return j;
     }
