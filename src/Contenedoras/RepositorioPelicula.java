@@ -34,5 +34,5 @@ public class RepositorioPelicula {
 
         return jsonArray; // devuelve arreglo JSON
     }
-    
+
 }

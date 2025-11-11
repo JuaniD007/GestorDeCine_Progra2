@@ -89,7 +89,7 @@ public class Reserva  implements ItoJson {
     }
 
     @Override
-    public JSONObject toJson() {
+    public JSONObject toJson() { // hacerlo
         return null;
     }
 }
