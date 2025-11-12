@@ -19,7 +19,7 @@ public class RepositorioEmpleado
     public boolean agregar(Empleado empleado) throws VerificarNulo, ElementoRepetido
     {
 
-        return this.empleadosGestionDeElementos.agregarElemento(empleado);
+        return this.empleadosGestionDeElementos.verificarElemento(empleado);
     }
 
     public Empleado buscar(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
