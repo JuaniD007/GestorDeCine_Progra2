@@ -8,14 +8,14 @@ import org.json.JSONObject;
 import java.time.LocalDate;
 
 public class Reserva  implements ItoJson {
-    private int idReserva;
+    private String idReserva;
     private boolean estadoReserva;
     private int numAsiento;
     private LocalDate fechaReserva;
     private boolean pagado;
     private Funcion funcion;
 
-    public Reserva(Funcion funcion, boolean estadoReserva, LocalDate fechaReserva, int idReserva, int numAsiento, boolean pagado) {
+    public Reserva(Funcion funcion, boolean estadoReserva, LocalDate fechaReserva, String idReserva, int numAsiento, boolean pagado) {
         this.estadoReserva = estadoReserva;
         this.fechaReserva = fechaReserva;
         this.idReserva = idReserva;
@@ -48,13 +48,9 @@ public class Reserva  implements ItoJson {
         this.fechaReserva = fechaReserva;
     }
 
-    public int getIdReserva() {
-        return idReserva;
-    }
+    public String getIdReserva() {return idReserva;}
 
-    public void setIdReserva(int idReserva) {
-        this.idReserva = idReserva;
-    }
+    public void setIdReserva(String idReserva) {this.idReserva = idReserva;}
 
     public int getNumAsiento() {
         return numAsiento;
@@ -79,6 +75,7 @@ public class Reserva  implements ItoJson {
         }
         return false;
     }
+
     public String generarTicket() {
         return "🎟️ TICKET DE RESERVA 🎟️\n" +
                 "Código: " + idReserva + "\n" +
@@ -97,8 +94,8 @@ public class Reserva  implements ItoJson {
             j.put("idReserva", this.idReserva);
             j.put("estadoReserva", this.estadoReserva);
             j.put("Pagado", this.pagado);
-            j.put("fechaReserva", this.fechaReserva);
-            j.put("funcion", this.funcion);
+            j.put("fechaReserva", this.fechaReserva.toString());
+            j.put("funcion", this.funcion != null ? this.funcion.toJson() : JSONObject.NULL);
             j.put("numAsiento", this.numAsiento);
 
         } catch (JSONException e) {
@@ -106,4 +103,16 @@ public class Reserva  implements ItoJson {
         }
         return j ;
     }
+
+    public static Reserva traerJSon(JSONObject o) throws JSONException {
+        // Reconstruye la reserva desde el JSON
+        String idReserva = o.getString("idReserva");
+        boolean estadoReserva = o.getBoolean("estadoReserva");
+        boolean pagado = o.getBoolean("Pagado");
+        int numAsiento = o.getInt("numAsiento");
+        LocalDate fechaReserva = LocalDate.parse(o.getString("fechaReserva"));
+        // Si funcion también se serializa, deberías reconstruirla aquí
+        return new Reserva(null, estadoReserva, fechaReserva, idReserva, numAsiento, pagado);
+    }
+
 }
