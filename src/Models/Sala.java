@@ -1,4 +1,6 @@
 package Models;
+import Excepciones.*;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,15 +10,13 @@ public class Sala
     private int numSala;
     private int capacidadTotal;
     private boolean es3D;
-    private String  idFuncion;
     private ArrayList <Funcion> funcionesDelDia;
 
 
-    public Sala(int capacidadTotal, boolean es3D, String idFuncion, int numSala) {
+    public Sala(int capacidadTotal, boolean es3D,  int numSala) {
         this.capacidadTotal = capacidadTotal;
         this.es3D = es3D;
         this.funcionesDelDia = new ArrayList<>();
-        this.idFuncion = idFuncion;
         this.numSala = numSala;
     }
     public Sala (){}
@@ -44,14 +44,6 @@ public class Sala
         this.funcionesDelDia = funcionesDelDia;
     }
 
-    public String getIdFuncion() {
-        return idFuncion;
-    }
-
-    public void setIdFuncion(String idFuncion) {
-        this.idFuncion = idFuncion;
-    }
-
     public int getNumSala() {
         return numSala;
     }
@@ -60,28 +52,31 @@ public class Sala
         this.numSala = numSala;
     }
 
-    public boolean AgregarFuncion (Funcion f ){
-        return funcionesDelDia.add(f);
-    }
-    public Funcion buscarFuncion(LocalDateTime horario){
-        for ( Funcion f : funcionesDelDia){
-            if(f.getHorario().equals(horario)){
-                return f;
+    public boolean agregarFuncion(Funcion nuevaFuncion) throws VerificarNulo, FuncionSuperpuesta {
+        // Validar que la función y su sala no sean nulas
+        if (nuevaFuncion == null) {
+            throw new VerificarNulo("La función no puede ser nula.");
+        }
+        if (nuevaFuncion.getSala() == null) {
+            throw new VerificarNulo("La función debe tener una sala asignada.");
+        }
+
+        // Verificar que la función pertenece a esta misma sala
+        if (nuevaFuncion.getSala().getNumSala() != this.numSala) {
+            throw new VerificarNulo("La función pertenece a otra sala ("
+                    + nuevaFuncion.getSala().getNumSala() + ").");
+        }
+
+        // Verificar si ya hay una función en ese mismo horario
+        for (Funcion existente : funcionesDelDia) {
+            if (existente.getHorario().equals(nuevaFuncion.getHorario())) {
+                throw new FuncionSuperpuesta("Ya existe una función programada a las " + nuevaFuncion.getHorario() + " en la sala " + numSala + ".");
             }
         }
-        return null;  // no lo encontroo
-    }
 
-
-    public ArrayList<Funcion> buscarFuncionDelDia(LocalDate dia) {
-        ArrayList<Funcion> funcionesEncontradas = new ArrayList<>();
-
-        for (Funcion f : funcionesDelDia) {
-            if (f.getHorario().equals(dia)) {
-                funcionesEncontradas.add(f);
-            }
-        }
-        return funcionesEncontradas; // devuelve la todas funciones del dia
+        // Si pasa todas las validaciones, agregar la función
+        funcionesDelDia.add(nuevaFuncion);
+        return true;
     }
 
     @Override
@@ -90,7 +85,6 @@ public class Sala
                 "capacidadTotal=" + capacidadTotal +
                 ", numSala=" + numSala +
                 ", es3D=" + es3D +
-                ", idFuncion='" + idFuncion + '\'' +
                 ", funcionesDelDia=" + funcionesDelDia +
                 '}';
     }

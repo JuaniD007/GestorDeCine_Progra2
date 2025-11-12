@@ -1,18 +1,20 @@
 package Models;
-
-import Interfaces.IPagable;
+import Interfaces.ItoJson;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Objects;
 
-public class Funcion   {
+public class Funcion implements ItoJson {
     private Pelicula pelicula;
     private Sala sala;
-    private LocalDate horario;
+    private LocalDateTime horario;
     private HashMap <Integer, Cliente> butacaOcupadas;
 
-    public Funcion( LocalDate horario, Pelicula pelicula, Sala sala) {
+    public Funcion( LocalDateTime horario, Pelicula pelicula, Sala sala) {
         this.butacaOcupadas = new HashMap<>();
         this.horario = horario;
         this.pelicula = pelicula;
@@ -27,11 +29,11 @@ public class Funcion   {
         this.butacaOcupadas = butacaOcupadas;
     }
 
-    public LocalDate getHorario() {
+    public LocalDateTime getHorario() {
         return horario;
     }
 
-    public void setHorario(LocalDate horario) {
+    public void setHorario(LocalDateTime horario) {
         this.horario = horario;
     }
 
@@ -97,5 +99,19 @@ public class Funcion   {
       ("Horario: " + horario)+
       ("Butacas ocupadas: " + butacaOcupadas.size())+
       ("Butacas disponibles: " + butacasDisponibles());
+    }
+
+    public JSONObject toJson() {
+        JSONObject j = new JSONObject();
+        try {
+            j.put("idReserva", this.horario);
+            j.put("estadoReserva", this.butacaOcupadas);
+            j.put("estadoReserva", this.sala);
+            j.put("estadoReserva", this.pelicula);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return j ;
     }
 }
