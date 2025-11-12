@@ -59,14 +59,14 @@ public class GestorUsuario {
         // --- 2. CREACIÓN DEL OBJETO Y ASIGNACIÓN DE ID (Implícito) ---
         // El ID se genera dentro del constructor de Cliente/Empleado (o Usuario)
         Usuario usuario;
-        String tipoAñadido;
+        String tipoAniadido;
 
         if (tipo != null && tipo.equalsIgnoreCase("Cliente")) {
             usuario = new Cliente(nombre, dni, edad, email);
-            tipoAñadido = "Cliente";
+            tipoAniadido = "Cliente";
         } else {
             usuario = new Empleado(nombre, dni, edad, email);
-            tipoAñadido = "Empleado";
+            tipoAniadido = "Empleado";
         }
 
         // --- 3. AGREGAR AL REPOSITORIO ---
@@ -74,10 +74,10 @@ public class GestorUsuario {
             // Llama al método del repositorio que valida duplicados (ej. por DNI) y agrega el usuario.
             if (repoUsuario.agregarUsuario(usuario)) {
                 // El toString() de 'usuario' debe incluir el ID generado automáticamente.
-                return tipoAñadido + " agregado correctamente: " + usuario.toString();
+                return tipoAniadido + " agregado correctamente: " + usuario.toString();
             } else {
                 // Caso alternativo si verificarUsuario retorna false sin lanzar excepción
-                return "Error desconocido al intentar agregar " + tipoAñadido + ".";
+                return "Error desconocido al intentar agregar " + tipoAniadido + ".";
             }
         } catch (Exception e) {
             // Captura excepciones lanzadas por el repositorio (ej. DNI duplicado)
