@@ -6,6 +6,8 @@ import Excepciones.VerificarNulo;
 import Models.Pelicula;
 import org.json.JSONArray;
 
+import java.util.ArrayList;
+
 public class RepositorioPelicula {
     private GestionDeElementos<Pelicula> peliculaGestionDeElementos;
     private JSONArray j;
@@ -23,6 +25,10 @@ public class RepositorioPelicula {
     }
     public Pelicula buscarElemento(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido{
         return peliculaGestionDeElementos.buscarElemento(id);
+    }
+
+    public ArrayList<Pelicula> getListaPeliculas() {
+        return this.peliculaGestionDeElementos.getElementos();
     }
 
     public JSONArray ArregloDePeliculas() {

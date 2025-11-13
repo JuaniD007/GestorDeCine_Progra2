@@ -3,13 +3,14 @@ package Contenedoras;
 import Excepciones.ElementoNoExiste;
 import Excepciones.ElementoRepetido;
 import Excepciones.VerificarNulo;
+import Interfaces.IIdentificable;
 import Models.Cliente;
 import Models.Pelicula;
 import Models.Usuario;
 
 import java.util.ArrayList;
 
-public class GestionDeElementos<T> {
+public class GestionDeElementos<T extends IIdentificable> {
     private ArrayList<T> elementos;
 
     public GestionDeElementos() {
@@ -23,82 +24,54 @@ public class GestionDeElementos<T> {
 
     public boolean agregarElemento(T objeto) throws VerificarNulo, ElementoRepetido {
         if (objeto == null) {
-            throw new VerificarNulo("El objeto a agregar es nulo. No se puede añadir a la colección");
+            throw new VerificarNulo("El objeto a agregar es nulo.");
         }
 
-        String idDelObjeto = null;
+        // --- LÓGICA ARREGLADA ---
+        try {
+            // 1. Buscamos primero. Ahora podemos usar .getId()
+            buscarElemento(objeto.getId());
 
-        if (objeto instanceof Usuario usuario) {
-            idDelObjeto = usuario.getId();
-        } else if (objeto instanceof Pelicula pelicula) {
-            idDelObjeto = pelicula.getIdPelicula();
+            // 2. Si lo encuentra (y no lanza excepción), significa que está repetido.
+            throw new ElementoRepetido("Error: Ya existe un elemento con ID " + objeto.getId());
+
+        } catch (ElementoNoExiste e) {
+            // 3. Si lanza ElementoNoExiste, ¡perfecto! Lo agregamos.
+            return this.elementos.add(objeto);
         }
-
-        if (idDelObjeto != null) {
-            try {
-
-                T elementoExistente = buscarElemento(idDelObjeto);
-
-
-                throw new ElementoRepetido("Error: Ya existe un elemento con ID " + idDelObjeto + " No se agrega");
-
-            } catch (ElementoNoExiste e) {
-                e.getMessage();
-            } catch (VerificarNulo e) {
-                throw new VerificarNulo("Error interno: La coleccion es nula.No se pudo validar");
-            } catch (ElementoRepetido e) {
-                throw new ElementoRepetido("Error interno: El ID " + idDelObjeto + " ya está duplicado en la coleccion");
-            }
-        }
-
-        return this.elementos.add(objeto);
+        // (El catch de VerificarNulo y ElementoRepetido de buscarElemento se propagan solos)
     }
 
 
     public T buscarElemento(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         if (this.elementos == null) {
-            throw new VerificarNulo("La colección de elementos es nula y no se puede buscar");
+            throw new VerificarNulo("La colección de elementos es nula.");
         }
+
         T elementoBuscar = null;
-        int contador = 0;
+        int contador = 0; // Para tu chequeo de duplicados (aunque agregarElemento ya no lo permite)
 
+        // --- LÓGICA LIMPIA ---
         for (T buscado : this.elementos) {
-            boolean encontrado = false;
-
-            if (buscado instanceof Usuario usuario) {
-                if (usuario.getId().equals(id)) {
-                    encontrado = true;
-                }
-            }
-
-            if (buscado instanceof Pelicula pelicula) {
-                if (pelicula.getIdPelicula().equals(id)) {
-                    encontrado = true;
-                }
-            }
-
-            if (encontrado) {
+            if (buscado.getId().equals(id)) { // <-- Sin 'instanceof'
                 if (elementoBuscar == null) {
                     elementoBuscar = buscado;
-
-                } else {
-                    contador++;
                 }
+                contador++;
             }
         }
+        // --- FIN LÓGICA LIMPIA ---
 
         if (contador > 1) {
-            throw new ElementoRepetido("Se encontraron " + contador +
-                    " elementos con el ID " + id + " Los IDs deben ser únicos");
+            throw new ElementoRepetido("Error: Se encontraron " + contador + " elementos con el ID " + id);
         }
 
         if (elementoBuscar == null) {
-            throw new ElementoNoExiste("El elemento que se intento buscar no existe");
+            throw new ElementoNoExiste("No se encontró elemento con ID " + id);
         }
 
         return elementoBuscar;
     }
-
 
     public boolean eliminarElemento(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         T elementoAEliminar = null;
@@ -117,6 +90,7 @@ public class GestionDeElementos<T> {
 
         return eliminado;
     }
+
 
 
 }

@@ -1,5 +1,6 @@
 package Models;
 
+import Interfaces.IIdentificable;
 import Interfaces.ItoJson;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -7,19 +8,21 @@ import org.json.JSONObject;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class Usuario implements ItoJson {
+public abstract class Usuario implements ItoJson, IIdentificable {
     protected String id;
     protected String nombre;
     protected String dni;
     protected int edad;
     protected String email;
+    protected String contrasenia;
 
-    public Usuario( String nombre, String dni, int edad, String email) {
+    public Usuario( String nombre, String dni, int edad, String email, String contrasenia) {
         this.id = UUID.randomUUID().toString(); // Genera ID único
         this.nombre = nombre;
         this.dni = dni;
         this.edad = edad;
         this.email = email;
+        this.contrasenia = contrasenia;
     }
 
 
@@ -53,6 +56,14 @@ public abstract class Usuario implements ItoJson {
 
     public String getEmail() {return email;}
 
+    public String getContrasenia() {
+        return contrasenia;
+    }
+
+    public void setContrasenia(String contrasenia) {
+        this.contrasenia = contrasenia;
+    }
+
     public void setId(String id) {
         this.id = id;
     }
@@ -73,12 +84,12 @@ public abstract class Usuario implements ItoJson {
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof Usuario usuario)) return false;
-        return Objects.equals(id, usuario.id);
+        return Objects.equals(dni, usuario.dni);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        return Objects.hash(dni);
     }
 
     @Override
@@ -93,6 +104,7 @@ public abstract class Usuario implements ItoJson {
                 jsonObject.put("dni", dni);
                 jsonObject.put("edad", edad);
                 jsonObject.put("email", email);
+                jsonObject.put("contrasenia", contrasenia);
             }catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -110,6 +122,7 @@ public abstract class Usuario implements ItoJson {
        u.setDni(o.getString("dni"));
        u.setEdad(o.getInt("edad"));
        u.setEmail(o.getString("email"));
+       u.setContrasenia(o.getString("contrasenia"));
        } catch (JSONException e) {
           e.printStackTrace();
        }

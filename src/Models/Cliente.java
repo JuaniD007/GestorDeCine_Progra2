@@ -11,13 +11,13 @@ import java.util.Objects;
 public class Cliente extends Usuario implements ItoJson {
     private ArrayList<Reserva> reservaArrayList;
 
-    public Cliente(String nombre, String dni, int edad, String email) {
-        super(nombre, dni, edad, email);
+    public Cliente(String nombre, String dni, int edad, String email, String contrasenia) {
+        super(nombre, dni, edad, email, contrasenia);
         this.reservaArrayList = new ArrayList<>();
     }
 
     public Cliente() {
-        super("", "", 0, "");
+        super("", "", 0, "","");
         this.reservaArrayList = new ArrayList<>();
     }
 
@@ -41,6 +41,8 @@ public class Cliente extends Usuario implements ItoJson {
     public JSONObject toJson() {
         JSONObject j = super.toJson();
         try {
+
+            j.put("tipo", "Cliente");
             JSONArray arregloReservas = new JSONArray();
             if (reservaArrayList != null) {
                 for (Reserva reserva : reservaArrayList) {
