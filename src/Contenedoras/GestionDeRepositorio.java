@@ -4,16 +4,13 @@ import Excepciones.ElementoNoExiste;
 import Excepciones.ElementoRepetido;
 import Excepciones.VerificarNulo;
 import Interfaces.IIdentificable;
-import Models.Cliente;
-import Models.Pelicula;
-import Models.Usuario;
 
 import java.util.ArrayList;
 
-public class GestionDeElementos<T extends IIdentificable> {
+public class GestionDeRepositorio<T extends IIdentificable> {
     private ArrayList<T> elementos;
 
-    public GestionDeElementos() {
+    public GestionDeRepositorio() {
         this.elementos = new ArrayList<>();
     }
 

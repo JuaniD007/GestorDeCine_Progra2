@@ -6,7 +6,9 @@ public enum Genero {
     COMEDIA(2),
     DRAMA(3),
     TERROR(4),
-    ANIMADA(5);
+    ANIMADA(5),
+    FICCION(6),
+    SUSPENSO(7);
 
     private final int id;
 

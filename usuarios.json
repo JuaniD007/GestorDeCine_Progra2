@@ -1,0 +1,20 @@
+[
+    {
+        "tipo": "Administrador",
+        "contrasenia": "admin",
+        "id": "a6bc7d9c",
+        "nombre": "Admin General",
+        "edad": 99,
+        "dni": "11111111",
+        "email": "admin@cine.com"
+    },
+    {
+        "tipo": "Cliente",
+        "contrasenia": "1234",
+        "id": "ce128173",
+        "nombre": "Juan Ignacio",
+        "edad": 21,
+        "dni": "44831001",
+        "email": "juanid2003@gmail.com"
+    }
+]

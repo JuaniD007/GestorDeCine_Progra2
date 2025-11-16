@@ -97,7 +97,7 @@ public class GestorUsuario {
     public void guardarDatos() {
         JSONArray jsonArray = new JSONArray();
 
-        // 2. Usa el método getMapa() que agregaste en el Repositorio (Paso Previo 3)
+        // 2. Usa el método getUsuarios() que agregaste en el Repositorio (Paso Previo 3)
         for (Usuario usuario : repoUsuario.getUsuarios().values()) {
             jsonArray.put(usuario.toJson());
         }
@@ -107,64 +107,97 @@ public class GestorUsuario {
     }
 
 
-    public String crearUsuario(String tipo, String nombre, String dni, String edadStr, String email, String contrasenia) {
+    public void crearUsuario(String tipo, String nombre, String dni, String edadStr, String email, String contrasenia)
+            throws ValidacionException, ElementoRepetido, VerificarNulo, NumberFormatException {
 
-        // ... ( código de validaciones) ...
+        // --- 1. VALIDACIONES (lanzan excepción si fallan) ---
 
-        try {
-            // --- Simulación de tu código de validación y creación ---
-            if (!Validaciones.isStringValido(nombre) || !Validaciones.isDniValido(dni) || !Validaciones.isEmailValido(email) || !Validaciones.isStringValido(contrasenia)) {
-                return "Error: Campos inválidos.";
-            }
-            int edad = Integer.parseInt(edadStr.trim());
-            if (!Validaciones.isRangoValido(edad, 18, 90)) {
-                return "Error: Edad fuera de rango.";
-            }
 
-            Usuario usuario;
-            String tipoAniadido;
-            if (tipo.equalsIgnoreCase("Cliente")) {
-                usuario = new Cliente(nombre.trim(), dni.trim(), edad, email.trim(), contrasenia.trim());
-                tipoAniadido = "Cliente";
-            } else {
-                usuario = new Administrador(nombre.trim(), dni.trim(), edad, email.trim(), contrasenia.trim());
-                tipoAniadido = "Administrador";
-            }
-            // --- Fin Simulación ---
-
-            repoUsuario.agregarUsuario(usuario); // Agrega a memoria
-
-            // ¡IMPORTANTE! Guarda en disco después de agregar
-            guardarDatos();
-
-            return tipoAniadido + " agregado correctamente: " + usuario.toString();
-
-        } catch (NumberFormatException e) {
-            return "Error: La edad debe ser un número.";
-        } catch (Exception e) { // Atrapa ElementoRepetido, VerificarNulo
-            return "Error al agregar usuario: " + e.getMessage();
+        if (!Validaciones.isNombreValido(nombre)) {
+            throw new ValidacionException("Error: El nombre solo puede contener letras y espacios.");
         }
+
+        if (!Validaciones.isStringValido(nombre)) {
+            throw new ValidacionException("Error: El nombre no puede estar vacío.");
+        }
+        if (!Validaciones.isDniValido(dni)) {
+            throw new ValidacionException("Error: DNI inválido.");
+        }
+        if (!Validaciones.isEmailValido(email)) {
+            throw new ValidacionException("Error: formato de Email inválido, Email valido: example@gmail.com ");
+        }
+
+        if (repoUsuario.buscarUsuarioPorEmail(email) != null) {
+            throw new ValidacionException("Error: El email '" + email.trim() + "' ya está registrado.");
+        }
+
+        if (!Validaciones.isStringValido(contrasenia)) {
+            throw new ValidacionException("Error: La contraseña no puede estar vacía.");
+        }
+
+        int edad;
+        try {
+            edad = Integer.parseInt(edadStr.trim());
+        } catch (NumberFormatException e) {
+            // Relanza la excepción para que el Menú la atrape
+            throw new NumberFormatException("Error: La edad debe ser un número entero.");
+        }
+
+        if (!Validaciones.isRangoValido(edad, 18, 90)) {
+            throw new ValidacionException("Error: Edad inválida. Debe estar entre 18 y 90.");
+        }
+        // --- FIN VALIDACIONES ---
+
+        // --- 2. CREACIÓN DEL OBJETO ---
+        Usuario usuario;
+        if (tipo != null && tipo.equalsIgnoreCase("Cliente")) {
+            usuario = new Cliente(nombre.trim(), dni.trim(), edad, email.trim(), contrasenia.trim());
+        } else {
+            usuario = new Administrador(nombre.trim(), dni.trim(), edad, email.trim(), contrasenia.trim());
+        }
+
+        // --- 3. AGREGAR AL REPOSITORIO (lanza ElementoRepetido si falla) ---
+        repoUsuario.agregarUsuario(usuario);
+
+        // --- 4. PERSISTIR ---
+        guardarDatos();
+
+        // Si llega aquí, todo salió bien (no devuelve nada)
     }
 
-    public String iniciarSesion(String dni, String contrasenia) {
-        // ¡Este método no necesita cambios!
-        // El repositorio ya fue cargado por el constructor.
+    /**
+     * Valida el inicio de sesión.
+     * Devuelve el objeto Usuario si es exitoso.
+     * Lanza una excepción si falla.
+     */
+    public Usuario iniciarSesion(String dni, String contrasenia)
+            throws Exception {
 
+        // 1. Validación de formato
+        if (!Validaciones.isStringValido(dni) || !Validaciones.isStringValido(contrasenia)) {
+            throw new ValidacionException("Error: DNI y contraseña no pueden estar vacíos.");
+        }
+
+        // 2. Validación de existencia
         Usuario usuarioEncontrado = repoUsuario.buscarUsuarioPorDni(dni.trim());
 
         if (usuarioEncontrado == null) {
-            return "Error: DNI o contraseña incorrectos.";
+            // Mensaje genérico por seguridad
+            throw new Exception("Error: DNI o contraseña incorrectos.");
         }
 
-        // Gracias al Paso Previo 1, getContrasenia() no será null
+        // 3. Validación de contraseña
         if (usuarioEncontrado.getContrasenia().equals(contrasenia.trim())) {
-            return "Login exitoso. ¡Bienvenido, " + usuarioEncontrado.getNombre() + "!";
+            // ¡Éxito! Devuelve el objeto Usuario completo
+            return usuarioEncontrado;
         } else {
-            return "Error: DNI o contraseña incorrectos.";
+            // Mensaje genérico por seguridad
+            throw new Exception("Error: DNI o contraseña incorrectos.");
         }
     }
 
     // (Necesario para que el Menu obtenga el objeto)
+
     public Usuario buscarUsuarioPorDni(String dni) {
         return repoUsuario.buscarUsuarioPorDni(dni.trim());
     }
