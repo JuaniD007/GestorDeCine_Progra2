@@ -14,19 +14,7 @@ public class RepositorioUsuario <T extends Usuario>   {
     private HashMap<String, T> usuarios = new HashMap<>();
     private static final String ARCHIVO_USUARIOS = "usuarios.json";
     public RepositorioUsuario() {
-        // Creamos el admin harcodeado con los datos que pediste
-        Administrador admin = new Administrador(
-                "Admin General",   // nombre
-                "11111111",        // dni
-                18,                // edad (una edad simbólica)
-                "admin@cine.com",  // email (necesita uno, puedes inventarlo)
-                "admin"            // contrasenia
-        );
 
-        // Lo agregamos directamente al mapa.
-        // Usamos (T) para "castear" el Administrador al tipo genérico T
-        // (que en tu GestorUsuario será 'Usuario', así que es seguro)
-        usuarios.put(admin.getDni(), (T) admin);
     }
 
     public HashMap<String, T> getUsuarios() {

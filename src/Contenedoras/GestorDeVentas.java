@@ -44,7 +44,7 @@ public class GestorDeVentas {
      * Lógica principal de compra. Valida y crea una reserva.
      * Actualiza la función (ocupa el asiento) y persiste ambos cambios.
      */
-    public void crearReserva(String idCliente, String idFuncion, int numAsiento)
+    public void crearReserva(String idCliente, String idFuncion, int numAsiento, double precioTotal)
             throws ValidacionException, ElementoNoExiste, VerificarNulo, ElementoRepetido {
 
         // 1. Buscamos los objetos (usando el otro gestor)
@@ -71,11 +71,46 @@ public class GestorDeVentas {
         gestorCatalogo.guardarFunciones();
 
         // C. Creamos la nueva reserva
-        Reserva nuevaReserva = new Reserva(idCliente, idFuncion, numAsiento, LocalDate.now(), false, true); // (pagado=false, activa=true)
+        Reserva nuevaReserva = new Reserva(idCliente, idFuncion, numAsiento, LocalDate.now(), false, true, precioTotal ); // (pagado=false, activa=true)
 
         // D. Guardamos la reserva en su propio repositorio y archivo
         repoReservas.agregarReserva(nuevaReserva);
         guardarReservas();
+    }
+    public double pagarReserva(String idReserva)
+            throws ValidacionException, ElementoNoExiste, VerificarNulo, ElementoRepetido {
+
+        // 1. Buscamos la reserva
+        Reserva reserva = repoReservas.buscarReserva(idReserva);
+
+        // 2. Validación
+        if (reserva.isPagado()) {
+            throw new ValidacionException("Error: Esta reserva ya fue pagada anteriormente.");
+        }
+
+        // 3. Actualizamos el objeto
+        reserva.setPagado(true);
+
+        // 4. Persistimos el cambio en el JSON
+        guardarReservas();
+
+        // 5. Devolvemos el total
+        return reserva.getPrecioTotal();
+    }
+
+
+    /**
+     * Busca solo las reservas NO pagadas de un cliente.
+     * (El Menú usará esto para la nueva opción)
+     */
+    public ArrayList<Reserva> buscarReservasPendientesPorCliente(String idCliente) {
+        ArrayList<Reserva> filtradas = new ArrayList<>();
+        for (Reserva r : repoReservas.getListaReservas()) {
+            if (r.getIdCliente().equals(idCliente) && !r.isPagado() && r.isEstadoReserva()) {
+                filtradas.add(r);
+            }
+        }
+        return filtradas;
     }
 
     /**
@@ -191,5 +226,9 @@ public class GestorDeVentas {
         // Es seguro borrar.
         return false;
     }
+
+
+
+
 }
 

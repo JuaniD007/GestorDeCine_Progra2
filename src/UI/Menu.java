@@ -261,7 +261,8 @@ public class Menu {
             System.out.println("\n--- 🎟️ MENÚ DE CLIENTE ---");
             System.out.println("1. Comprar Entrada");
             System.out.println("2. Ver Mis Reservas");
-            System.out.println("3. ver cartelera");
+            System.out.println("3. Ver Cartelera");
+            System.out.println("4. Pagar Reserva");
             System.out.println("9. Cerrar Sesión");
             System.out.print("Seleccione una opción: ");
 
@@ -282,6 +283,8 @@ public class Menu {
                 case 3:
                   uiListarPeliculasCliente();
                     break;
+                case 4 :
+                    break;
                 case 9:
                     System.out.println("Cerrando sesión de cliente...");
                     break;
@@ -290,6 +293,8 @@ public class Menu {
             }
         }
     }
+
+
 
     // --- UIs de LOGIN y REGISTRO ---
 
@@ -510,8 +515,23 @@ public class Menu {
             System.out.print("Ingrese el Número de Asiento (ej: 5): ");
             int numAsiento = Integer.parseInt(scanner.nextLine());
 
+            // --- ¡NUEVA LÓGICA PARA EL MENÚ! ---
+            // 6. El Menú ahora debe buscar la película para saber el precio
+            Pelicula pelicula = gestorDeCatalogo.buscarPelicula(funcionElegida.getIdPelicula());
+            double precioACobrar = pelicula.getPrecioBase();
+            // (Aquí podrías agregar lógica extra, ej: if (sala.is3D()) precioACobrar *= 1.25;)
+
+            System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
+            System.out.print("¿Confirmar compra? (S/N): ");
+            String confirmacion = scanner.nextLine();
+
+            if (!confirmacion.equalsIgnoreCase("S")) {
+                System.out.println("Compra cancelada.");
+                return;
+            }
+
             // 6. Llama al Gestor de Ventas (usando el ID que encontramos)
-            gestorDeVentas.crearReserva(this.usuarioLogueado.getId(), idFuncion, numAsiento);
+            gestorDeVentas.crearReserva(this.usuarioLogueado.getId(), idFuncion, numAsiento, precioACobrar);
             System.out.println("¡Reserva creada con éxito! (Pendiente de pago)");
 
         } catch (NumberFormatException e) {
@@ -591,6 +611,66 @@ public class Menu {
             } catch (Exception e) {
                 System.err.println("Error al cargar datos de función " + f.getId());
             }
+        }
+    }
+
+    private void uiPagarReserva() {
+        System.out.println("\n--- Pagar Reserva Pendiente ---");
+
+        // 1. Usamos el nuevo método del gestor
+        ArrayList<Reserva> pendientes = gestorDeVentas.buscarReservasPendientesPorCliente(this.usuarioLogueado.getId());
+
+        if (pendientes.isEmpty()) {
+            System.out.println("No tienes reservas pendientes de pago.");
+            return;
+        }
+
+        // 2. Mostramos la lista de pendientes con un índice
+        System.out.println("Tus reservas pendientes de pago:");
+        for (int i = 0; i < pendientes.size(); i++) {
+            Reserva r = pendientes.get(i);
+            String detalle = "";
+            try {
+                // Obtenemos el detalle (Peli, Sala, Hora)
+                detalle = gestorDeCatalogo.getDetalleFuncion(r.getIdFuncion());
+            } catch (Exception e) {
+                detalle = "Error al cargar detalle de función.";
+            }
+
+            System.out.printf("[%d] Asiento %d | %s | Precio: $%.2f\n",
+                    (i + 1),
+                    r.getNumAsiento(),
+                    detalle,
+                    r.getPrecioTotal() // <-- Mostramos el precio
+            );
+            System.out.println("-----");
+        }
+
+        try {
+            // 3. Pedimos al usuario que elija
+            System.out.print("Seleccione el número [#] de la reserva que desea pagar: ");
+            int seleccion = Integer.parseInt(scanner.nextLine());
+
+            if (seleccion < 1 || seleccion > pendientes.size()) {
+                System.err.println("Error: Selección no válida.");
+                return;
+            }
+
+            // 4. Traducimos la selección al ID de la reserva
+            Reserva reservaAPagar = pendientes.get(seleccion - 1);
+            String idReserva = reservaAPagar.getId();
+
+            // 5. Llamamos al Gestor para pagar
+            double totalPagado = gestorDeVentas.pagarReserva(idReserva);
+
+            // 6. Mostramos el resultado (¡tu requisito!)
+            System.out.println("\n¡Pago procesado con éxito!");
+            System.out.printf("Total pagado: $%.2f\n", totalPagado);
+
+        } catch (NumberFormatException e) {
+            System.err.println("Error: Debe ingresar un número.");
+        } catch (Exception e) {
+            System.err.println("Error al procesar el pago: " + e.getMessage());
         }
     }
 }
