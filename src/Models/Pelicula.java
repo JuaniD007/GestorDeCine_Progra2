@@ -53,6 +53,8 @@ public class Pelicula implements ItoJson, IIdentificable {
         return precioBase;
     }
 
+
+
     public void setPrecioBase(double precioBase) {
         this.precioBase = precioBase;
     }
@@ -105,6 +107,18 @@ public class Pelicula implements ItoJson, IIdentificable {
                e.printStackTrace();
         }
         return j ;
+    }
+
+    public String getDetalleCliente() {
+        String tituloStr = (this.titulo != null) ? this.titulo : "Sin Título";
+        String generoStr = (this.genero != null) ? this.genero.name() : "Sin Género";
+
+        // Formato: "Título de la Película" (Género) - 120 min.
+        return String.format("\"%s\" (%s) - %d min.",
+                tituloStr,
+                generoStr,
+                this.duracion
+        );
     }
 
     public static Pelicula traerDesdeJson (JSONObject o ){

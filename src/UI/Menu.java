@@ -44,8 +44,8 @@ public class Menu {
 
         while (opcion != 4) {
             System.out.println("\n--- BIENVENIDO AL CINE ---");
-            System.out.println("1. Iniciar Sesión (Cliente)");
-            System.out.println("2. Registrarse (Cliente)");
+            System.out.println("1. Iniciar Sesión");
+            System.out.println("2. Registrarse");
             System.out.println("3. Iniciar como Administrador");
             System.out.println("4. Salir");
             System.out.print("Seleccione una opción: ");
@@ -96,17 +96,22 @@ public class Menu {
      */
     private void mostrarMenuAdmin() {
         int opcion = 0;
-        while (opcion != 9) {
+        while (opcion != 10) {
             System.out.println("\n--- 🧑‍💼 MENÚ DE ADMINISTRADOR ---");
-            System.out.println("1. Crear Película");
-            System.out.println("2. Crear Sala");
-            System.out.println("3. Crear Función");
+            System.out.println("--- Inventario ---");
+            System.out.println("1. Agregar Película");
+            System.out.println("2. Agregar Sala");
+            System.out.println("3. Agregar Función");
+            System.out.println("\n--- Consultas ---");
             System.out.println("4. Listar Películas");
             System.out.println("5. Listar Salas");
             System.out.println("6. Listar Funciones");
-            System.out.println("9. Cerrar Sesión");
+            System.out.println("\n--- Mantenimiento ---");
+            System.out.println("7. Eliminar Película");
+            System.out.println("8. Eliminar Sala");
+            System.out.println("9. Eliminar Función");
+            System.out.println("\n10. Cerrar Sesión");
             System.out.print("Seleccione una opción: ");
-
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
@@ -133,7 +138,20 @@ public class Menu {
                 case 6:
                     uiListarFunciones();
                     break;
+                case 7:
+                    uiEliminarPelicula();
+                    break;
+
+                case 8:
+                    uiEliminarSala();
+                    break;
+
+
                 case 9:
+                    uiEliminarFuncion();
+                    break;
+
+                case 10:
                     System.out.println("Cerrando sesión de administrador...");
                     break;
                 default:
@@ -141,6 +159,97 @@ public class Menu {
             }
         }
     }
+
+
+
+
+
+
+    private void uiEliminarPelicula() {
+        System.out.println("\n--- Eliminar Película ---");
+        uiListarPeliculas(); // Mostramos la lista para que el admin vea los IDs
+
+        try {
+            System.out.print("Ingrese el ID de la Película que desea ELIMINAR: ");
+            String id = scanner.nextLine();
+
+            // Llama al Gestor (que lanza excepciones si falla)
+            gestorDeCatalogo.eliminarPelicula(id);
+
+            System.out.println("¡Película eliminada con éxito!");
+
+        } catch (Exception e) { // Atrapa ElementoNoExiste, etc.
+            System.err.println("Error al eliminar la película: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Pide un ID de Sala y llama al gestor para eliminarla.
+     */
+    private void uiEliminarSala() {
+        System.out.println("\n--- Eliminar Sala ---");
+        uiListarSalas(); // Mostramos la lista para que el admin vea los IDs
+
+        try {
+            System.out.print("Ingrese el ID de la Sala que desea ELIMINAR: ");
+            String id = scanner.nextLine();
+
+            gestorDeCatalogo.eliminarSala(id);
+            System.out.println("¡Sala eliminada con éxito!");
+
+        } catch (Exception e) {
+            System.err.println("Error al eliminar la sala: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Pide un ID de Función y llama al gestor para eliminarla.
+     */
+    private void uiEliminarFuncion() {
+        System.out.println("\n--- Eliminar Función ---");
+
+        // 1. Mostramos la lista de funciones para que el Admin vea los IDs
+        uiListarFunciones();
+
+        System.out.print("Ingrese el ID de la Función que desea ELIMINAR: ");
+        String idFuncion = scanner.nextLine();
+
+        // Salida rápida si no ingresa nada
+        if (idFuncion == null || idFuncion.trim().isEmpty()) {
+            System.out.println("Operación cancelada.");
+            return;
+        }
+
+        try {
+            // --- ¡VALIDACIÓN DE BLOQUEO! ---
+
+            // 2. Le preguntamos al Gestor de Ventas si la función está en uso.
+            //    (El Menú es el único que conoce a ambos gestores).
+            boolean tieneReservas = gestorDeVentas.funcionTieneReservas(idFuncion);
+
+            if (tieneReservas) {
+                // 3. Si está en uso (true), BLOQUEAMOS la eliminación.
+                //    Esto es un mensaje de error para el usuario, está bien usar .err.
+                System.err.println("\nError: No se puede eliminar la función (ID: " + idFuncion + ").");
+                System.err.println("Motivo: Ya tiene reservas activas vendidas.");
+
+            } else {
+                // 4. Si está libre (false), SÍ procedemos a borrar.
+                //    Llamamos al Gestor de Catálogo (el que sabe borrar funciones).
+                gestorDeCatalogo.eliminarFuncion(idFuncion);
+                System.out.println("¡Función eliminada con éxito!.");
+            }
+
+        } catch (ElementoNoExiste e) {
+            // Esta excepción salta si el ID que escribió el admin no existe
+            System.err.println("Error al eliminar: " + e.getMessage());
+        } catch (Exception e) {
+            // Atrapa cualquier otro error inesperado
+            System.err.println("Error inesperado al procesar la eliminación: " + e.getMessage());
+            e.printStackTrace(); // Para depuración
+        }
+    }
+
 
     /**
      * Bucle del Menú de Cliente.
@@ -150,9 +259,9 @@ public class Menu {
         int opcion = 0;
         while (opcion != 9) {
             System.out.println("\n--- 🎟️ MENÚ DE CLIENTE ---");
-            System.out.println("1. Comprar Entrada (Crear Reserva)");
+            System.out.println("1. Comprar Entrada");
             System.out.println("2. Ver Mis Reservas");
-            System.out.println("3. Listar Películas Disponibles");
+            System.out.println("3. ver cartelera");
             System.out.println("9. Cerrar Sesión");
             System.out.print("Seleccione una opción: ");
 
@@ -171,7 +280,7 @@ public class Menu {
                     uiVerMisReservas();
                     break;
                 case 3:
-                    uiListarPeliculas();
+                  uiListarPeliculasCliente();
                     break;
                 case 9:
                     System.out.println("Cerrando sesión de cliente...");
@@ -201,6 +310,11 @@ public class Menu {
             this.usuarioLogueado = null;
         }
     }
+
+
+
+
+
 
     private void uiLoginAdmin() {
         System.out.println("\n--- Login Administrador ---");
@@ -244,8 +358,21 @@ public class Menu {
             System.out.println("¡Registro exitoso! Ahora puedes iniciar sesión.");
 
         } catch (Exception e) {
-            // El Menú atrapa CUALQUIER error de validación
+            // El Menú atrapa cualquier error de validación
             System.err.println("Error de registro: " + e.getMessage());
+        }
+    }
+
+    private void uiListarPeliculasCliente() {
+        System.out.println("\n--- Películas en Cartelera ---");
+        ArrayList<Pelicula> lista = gestorDeCatalogo.getListaPeliculas();
+        if (lista.isEmpty()) {
+            System.out.println("No hay películas cargadas en este momento.");
+            return;
+        }
+        for (Pelicula p : lista) {
+            // Llama al nuevo método 'getDetalleCliente()' de Pelicula.java
+            System.out.println("• " + p.getDetalleCliente());
         }
     }
 
@@ -375,7 +502,6 @@ public class Menu {
             Funcion funcionElegida = funcionesDisponibles.get(seleccion - 1);
             String idFuncion = funcionElegida.getId(); // <-- Obtenemos el "b9a5d1c4"
 
-            // --- El resto del proceso es el mismo que tenías ---
 
             // 5. Mostrar Asientos
             System.out.println("Asientos Ocupados: " + funcionElegida.getAsientosOcupados().toString());

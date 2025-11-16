@@ -123,6 +123,32 @@ public class GestorDeVentas {
         return ticket;
     }
 
+    public String getTicketDetalladoCliente(String idReserva, String nombreCliente)
+            throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+
+        // 1. Buscar los 4 objetos (esto es igual)
+        Reserva reserva = repoReservas.buscarReserva(idReserva);
+        Funcion funcion = gestorCatalogo.buscarFuncion(reserva.getIdFuncion());
+        Pelicula pelicula = gestorCatalogo.buscarPelicula(funcion.getIdPelicula());
+        Sala sala = gestorCatalogo.buscarSala(funcion.getIdSala());
+
+        // 2. Formatear
+        DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm 'hs'");
+
+        // 3. Armar el String (¡SIN IDs!)
+        String ticket = "🎟️ TICKET DE RESERVA 🎟️\n" +
+                "  Cliente: " + nombreCliente + "\n" +
+                "  Película: " + pelicula.getTitulo() + "\n" +
+                "  Sala: " + sala.getNumSala() + " (" + (sala.isEs3D() ? "3D" : "2D") + ")\n" +
+                "  Horario: " + funcion.getHorario().format(formatoHora) + " - " + funcion.getHorario().format(formatoFecha) + "\n" +
+                "  Asiento: " + reserva.getNumAsiento() + "\n" +
+                "  Pagado: " + (reserva.isPagado() ? "Sí" : "No");
+
+        return ticket;
+    }
+
+
     // --- 4. MÉTODOS PRIVADOS DE CARGA/GUARDADO ---
 
     public void guardarReservas() {
@@ -144,4 +170,26 @@ public class GestorDeVentas {
             }
         }
     }
+
+    public boolean funcionTieneReservas(String idFuncion) {
+
+        // Obtenemos la lista de TODAS las reservas del cine
+        ArrayList<Reserva> listaTotalReservas = repoReservas.getListaReservas();
+
+        for (Reserva r : listaTotalReservas) {
+
+            // Comprobamos si la reserva es de esa función Y si está activa
+            // (Asumimos que la reserva tiene un getter 'isEstadoReserva()')
+            if (r.getIdFuncion().equals(idFuncion) && r.isEstadoReserva()) {
+
+                // ¡Encontró una! Es peligroso borrar.
+                return true;
+            }
+        }
+
+        // Si el bucle termina, es porque no encontró ninguna.
+        // Es seguro borrar.
+        return false;
+    }
 }
+

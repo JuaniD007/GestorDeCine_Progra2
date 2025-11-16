@@ -19,16 +19,13 @@ public class GestorUsuario {
 
     // --- 1. CONSTRUCTOR PRINCIPAL (EL MOTOR DE ARRANQUE) ---
     public GestorUsuario() {
-        // Intenta leer el archivo usando tu método
+        // Intenta leer el archivo usando el método
         JSONTokener tokener = JsonUtiles.leerUnJson(ARCHIVO_USUARIOS);
 
         // 2. Comprueba si el archivo NO existía (tu método devuelve null)
         if (tokener == null) {
-            System.out.println("No se encontró " + ARCHIVO_USUARIOS + ". Creando admin por defecto...");
             crearAdminPorDefecto(); // Crea el admin y guarda el archivo
         } else {
-            // 3. Si SÍ existía, lo carga en memoria
-            System.out.println("Cargando usuarios desde " + ARCHIVO_USUARIOS + "...");
             try {
                 JSONArray usuariosJson = new JSONArray(tokener); // Convierte el Tokener a JSONArray
                 cargarUsuariosDesdeJson(usuariosJson);
@@ -76,7 +73,7 @@ public class GestorUsuario {
      */
     private void crearAdminPorDefecto() {
         Administrador admin = new Administrador(
-                "Admin General", "11111111", 18, "admin@cine.com", "admin");
+                "Admin General", "1111", 18, "admin@cine.com", "admin");
 
         try {
             // 1. Agrega el admin al repositorio en memoria
