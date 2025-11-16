@@ -1,98 +1,204 @@
 package Contenedoras;
 
-import Models.Usuario;
-import Models.Cliente;
-import Models.Empleado;
+import Models.*;
+import ModelsJson.JsonUtiles;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import Excepciones.*;
 
+import javax.print.attribute.standard.JobSheets;
 import java.util.regex.Pattern;
 // Se elimina la importación de Scanner ya que no se usa para leer entrada
 // en esta versión refactorizada de la clase de lógica.
 
 public class GestorUsuario {
-    // Repositorio genérico para almacenar usuarios (Cliente o Empleado)
     private RepositorioUsuario<Usuario> repoUsuario = new RepositorioUsuario<>();
+    private static final String ARCHIVO_USUARIOS = "usuarios.json";
+
+    // --- 1. CONSTRUCTOR PRINCIPAL (EL MOTOR DE ARRANQUE) ---
+    public GestorUsuario() {
+        // Intenta leer el archivo usando tu método
+        JSONTokener tokener = JsonUtiles.leerUnJson(ARCHIVO_USUARIOS);
+
+        // 2. Comprueba si el archivo NO existía (tu método devuelve null)
+        if (tokener == null) {
+            System.out.println("No se encontró " + ARCHIVO_USUARIOS + ". Creando admin por defecto...");
+            crearAdminPorDefecto(); // Crea el admin y guarda el archivo
+        } else {
+            // 3. Si SÍ existía, lo carga en memoria
+            System.out.println("Cargando usuarios desde " + ARCHIVO_USUARIOS + "...");
+            try {
+                JSONArray usuariosJson = new JSONArray(tokener); // Convierte el Tokener a JSONArray
+                cargarUsuariosDesdeJson(usuariosJson);
+            } catch (JSONException e) {
+
+                e.printStackTrace();
+
+            }
+
+        }
+    }
 
     /**
-     * Método para crear un usuario (Cliente o Empleado) según el tipo indicado,
-     * realizando validaciones.
-     *
-     * @param tipo El tipo de usuario a crear ("Cliente" o "Empleado").
-     * @param nombre Nombre del usuario.
-     * @param dni DNI del usuario.
-     * @param edadStr Edad del usuario como String (para manejo de errores de formato).
-     * @param email Email del usuario.
-     * @return String que contiene el mensaje de éxito (con el usuario) o el mensaje de error de validación/adición.
+     * Método privado para cargar un JSONArray en el repositorio de memoria.
+     * (Usado por el constructor si el JSON existe)
      */
-    public String crearUsuario(String tipo, String nombre, String dni, String edadStr, String email) {
-        // --- 1. VALIDACIONES DE ENTRADA ---
+    private void cargarUsuariosDesdeJson(JSONArray jsonArray) {
+        for (int i = 0; i < jsonArray.length(); i++) {
+            try {
+                JSONObject obj = jsonArray.getJSONObject(i);
+                String tipo = obj.getString("tipo"); // <-- Paso Previo 2
+                Usuario usuario = null;
 
-        // Validación de nombre
-        if (nombre == null || nombre.trim().isEmpty()) {
-            return "El nombre no puede estar vacío.";
+                // Fábrica para decidir qué clase instanciar
+                if (tipo.equals("Administrador")) {
+                    usuario = new Administrador("", "", 0, "", ""); // Objeto temporal
+                } else if (tipo.equals("Cliente")) {
+                    usuario = new Cliente("", "", 0, "", ""); // Objeto temporal
+                }
+
+                if (usuario != null) {
+                    // Rellena el objeto usando tu método estático (Paso Previo 1)
+                    usuario = Usuario.traerDesdeJson(usuario, obj);
+                    repoUsuario.agregarUsuario(usuario); // Agrega a memoria
+                }
+            } catch (Exception e) {
+                System.err.println("Error al cargar un usuario desde JSON: " + e.getMessage());
+            }
         }
-        nombre = nombre.trim();
+    }
 
-        // Validación de DNI
-        if (dni == null || dni.trim().isEmpty() || !dni.trim().matches("\\d+")) {
-            return "DNI inválido. Debe ser numérico y no vacío.";
+    /**
+     * Método privado para crear el admin hardcodeado y guardarlo.
+     * (Usado por el constructor si el JSON NO existe)
+     */
+    private void crearAdminPorDefecto() {
+        Administrador admin = new Administrador(
+                "Admin General", "11111111", 18, "admin@cine.com", "admin");
+
+        try {
+            // 1. Agrega el admin al repositorio en memoria
+            repoUsuario.agregarUsuario(admin);
+
+            // 2. Guarda el estado actual (con el admin) en el JSON
+            guardarDatos();
+
+        } catch (VerificarNulo | ElementoRepetido e) {
+            System.err.println("Error fatal al crear admin por defecto: " + e.getMessage());
         }
-        dni = dni.trim();
+    }
 
-        // Validación de edad
+    /**
+     * Método PÚBLICO para guardar el estado actual del repositorio en el JSON.
+     * Usa tu JsonUtiles.grabarUnJson
+     */
+    public void guardarDatos() {
+        JSONArray jsonArray = new JSONArray();
+
+        // 2. Usa el método getUsuarios() que agregaste en el Repositorio (Paso Previo 3)
+        for (Usuario usuario : repoUsuario.getUsuarios().values()) {
+            jsonArray.put(usuario.toJson());
+        }
+
+        // 3. Llama a tu método exacto de JsonUtiles
+        JsonUtiles.grabarUnJson(jsonArray, ARCHIVO_USUARIOS);
+    }
+
+
+    public void crearUsuario(String tipo, String nombre, String dni, String edadStr, String email, String contrasenia)
+            throws ValidacionException, ElementoRepetido, VerificarNulo, NumberFormatException {
+
+        // --- 1. VALIDACIONES (lanzan excepción si fallan) ---
+
+
+        if (!Validaciones.isNombreValido(nombre)) {
+            throw new ValidacionException("Error: El nombre solo puede contener letras y espacios.");
+        }
+
+        if (!Validaciones.isStringValido(nombre)) {
+            throw new ValidacionException("Error: El nombre no puede estar vacío.");
+        }
+        if (!Validaciones.isDniValido(dni)) {
+            throw new ValidacionException("Error: DNI inválido.");
+        }
+        if (!Validaciones.isEmailValido(email)) {
+            throw new ValidacionException("Error: formato de Email inválido, Email valido: example@gmail.com ");
+        }
+
+        if (repoUsuario.buscarUsuarioPorEmail(email) != null) {
+            throw new ValidacionException("Error: El email '" + email.trim() + "' ya está registrado.");
+        }
+
+        if (!Validaciones.isStringValido(contrasenia)) {
+            throw new ValidacionException("Error: La contraseña no puede estar vacía.");
+        }
+
         int edad;
         try {
             edad = Integer.parseInt(edadStr.trim());
         } catch (NumberFormatException e) {
-            return "Edad inválida. Debe ser un número entero.";
-        }
-        if (edad < 18 || edad > 90) {
-            return "Edad inválida. Debe estar entre 18 y 90 años.";
+            // Relanza la excepción para que el Menú la atrape
+            throw new NumberFormatException("Error: La edad debe ser un número entero.");
         }
 
-        // Validación de email
-        email = email.trim();
-        if (!esEmailValido(email)) {
-            return "Email inválido. Verifique el formato.";
+        if (!Validaciones.isRangoValido(edad, 18, 90)) {
+            throw new ValidacionException("Error: Edad inválida. Debe estar entre 18 y 90.");
         }
+        // --- FIN VALIDACIONES ---
 
-
-        // --- 2. CREACIÓN DEL OBJETO Y ASIGNACIÓN DE ID (Implícito) ---
-        // El ID se genera dentro del constructor de Cliente/Empleado (o Usuario)
+        // --- 2. CREACIÓN DEL OBJETO ---
         Usuario usuario;
-        String tipoAniadido;
-
         if (tipo != null && tipo.equalsIgnoreCase("Cliente")) {
-            usuario = new Cliente(nombre, dni, edad, email);
-            tipoAniadido = "Cliente";
+            usuario = new Cliente(nombre.trim(), dni.trim(), edad, email.trim(), contrasenia.trim());
         } else {
-            usuario = new Empleado(nombre, dni, edad, email);
-            tipoAniadido = "Empleado";
+            usuario = new Administrador(nombre.trim(), dni.trim(), edad, email.trim(), contrasenia.trim());
         }
 
-        // --- 3. AGREGAR AL REPOSITORIO ---
-        try {
-            // Llama al método del repositorio que valida duplicados (ej. por DNI) y agrega el usuario.
-            if (repoUsuario.verificarUsuario(usuario)) {
-                // El toString() de 'usuario' debe incluir el ID generado automáticamente.
-                return tipoAniadido + " agregado correctamente: " + usuario.toString();
-            } else {
-                // Caso alternativo si verificarUsuario retorna false sin lanzar excepción
-                return "Error desconocido al intentar agregar " + tipoAniadido + ".";
-            }
-        } catch (Exception e) {
-            // Captura excepciones lanzadas por el repositorio (ej. DNI duplicado)
-            return "Error al agregar usuario: " + e.getMessage();
+        // --- 3. AGREGAR AL REPOSITORIO (lanza ElementoRepetido si falla) ---
+        repoUsuario.agregarUsuario(usuario);
+
+        // --- 4. PERSISTIR ---
+        guardarDatos();
+
+        // Si llega aquí, todo salió bien (no devuelve nada)
+    }
+
+    /**
+     * Valida el inicio de sesión.
+     * Devuelve el objeto Usuario si es exitoso.
+     * Lanza una excepción si falla.
+     */
+    public Usuario iniciarSesion(String dni, String contrasenia)
+            throws Exception {
+
+        // 1. Validación de formato
+        if (!Validaciones.isStringValido(dni) || !Validaciones.isStringValido(contrasenia)) {
+            throw new ValidacionException("Error: DNI y contraseña no pueden estar vacíos.");
+        }
+
+        // 2. Validación de existencia
+        Usuario usuarioEncontrado = repoUsuario.buscarUsuarioPorDni(dni.trim());
+
+        if (usuarioEncontrado == null) {
+            // Mensaje genérico por seguridad
+            throw new Exception("Error: DNI o contraseña incorrectos.");
+        }
+
+        // 3. Validación de contraseña
+        if (usuarioEncontrado.getContrasenia().equals(contrasenia.trim())) {
+            // ¡Éxito! Devuelve el objeto Usuario completo
+            return usuarioEncontrado;
+        } else {
+            // Mensaje genérico por seguridad
+            throw new Exception("Error: DNI o contraseña incorrectos.");
         }
     }
 
+    // (Necesario para que el Menu obtenga el objeto)
 
-    /**
-     * Método auxiliar estático para validar email usando expresión regular.
-     * Retorna true si el email cumple el patrón, false si no.
-     */
-    private static boolean esEmailValido(String email) {
-        // Expresión regular para validar emails
-        String regex = "^[\\w.-]+@[\\w.-]+\\.[a-zA-Z]{2,}$";
-        return Pattern.matches(regex, email);
+    public Usuario buscarUsuarioPorDni(String dni) {
+        return repoUsuario.buscarUsuarioPorDni(dni.trim());
     }
 }

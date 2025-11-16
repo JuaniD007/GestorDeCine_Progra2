@@ -1,0 +1,17 @@
+[
+    {
+        "precioBase": 4000,
+        "genero": "ACCION",
+        "titulo": "Dune 2",
+        "duracion": 120,
+        "idPelicula": "b83977b3"
+    },
+
+    {
+        "precioBase": 7500,
+        "genero": "ACCION",
+        "titulo": "Exterminio 3",
+        "duracion": 90,
+        "idPelicula": "667566a1"
+    }
+]

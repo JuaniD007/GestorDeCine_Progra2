@@ -6,11 +6,13 @@ import Excepciones.VerificarNulo;
 import Models.Pelicula;
 import org.json.JSONArray;
 
+import java.util.ArrayList;
+
 public class RepositorioPelicula {
-    private GestionDeElementos<Pelicula> peliculaGestionDeElementos;
+    private GestionDeRepositorio<Pelicula> peliculaGestionDeElementos;
     private JSONArray j;
     public RepositorioPelicula() {
-        this.peliculaGestionDeElementos = new GestionDeElementos<>();
+        this.peliculaGestionDeElementos = new GestionDeRepositorio<>();
         this.j = new JSONArray();
     }
 
@@ -25,14 +27,22 @@ public class RepositorioPelicula {
         return peliculaGestionDeElementos.buscarElemento(id);
     }
 
-    public JSONArray toJson() {
+    public ArrayList<Pelicula> getListaPeliculas() {
+        return this.peliculaGestionDeElementos.getElementos();
+
+
+
+    }
+
+    public JSONArray ArregloDePeliculas() {
         JSONArray jsonArray = new JSONArray();
 
-        for (Pelicula pelicula : this.peliculaGestionDeElementos.getElementos()) { // Recorre una por una todas las películas que están guardadas dentro de tu GestionDeElementos.
+        for (Pelicula pelicula : this.peliculaGestionDeElementos.getElementos()) { // Recorre una por una todas las películas que están guardadas dentro de tu GestionDeRepositorio.
             jsonArray.put(pelicula.toJson());
         }
 
         return jsonArray; // devuelve arreglo JSON
     }
+
 
 }

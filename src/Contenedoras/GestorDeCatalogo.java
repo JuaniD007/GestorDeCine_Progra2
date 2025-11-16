@@ -1,0 +1,284 @@
+package Contenedoras;
+import Models.*;
+import Excepciones.*;
+import Enum.Genero;
+import ModelsJson.JsonUtiles;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
+public class GestorDeCatalogo {
+
+    // --- 1. ATRIBUTOS (Maneja 3 repositorios) ---
+    private RepositorioPelicula repoPeliculas;
+    private RepositorioSala repoSalas;
+    private RepositorioFuncion repoFunciones;
+
+    // Nombres de los archivos de persistencia
+    private static final String ARCHIVO_PELICULAS = "peliculas.json";
+    private static final String ARCHIVO_SALAS = "salas.json";
+    private static final String ARCHIVO_FUNCIONES = "funciones.json";
+
+    // --- 2. CONSTRUCTOR (Carga los 3 JSON al iniciar) ---
+    public GestorDeCatalogo() {
+        // Inicializa los "almacenes" de memoria
+        this.repoPeliculas = new RepositorioPelicula();
+        this.repoSalas = new RepositorioSala();
+        this.repoFunciones = new RepositorioFuncion();
+
+        // Carga los datos desde los archivos JSON
+        cargarPeliculas();
+        cargarSalas();
+        cargarFunciones();
+    }
+
+    // --- 3. MÉTODOS PÚBLICOS (La "API" para el Menú) ---
+
+    // --- API de PELÍCULAS ---
+
+    /**
+     * Valida y crea una nueva película.
+     * Lanza excepciones si la validación falla o el título ya existe.
+     */
+    public void crearPelicula(String titulo, Genero genero, int duracion, double precioBase)
+            throws ValidacionException, ElementoRepetido, VerificarNulo {
+
+        // Validaciones de formato
+        if (!Validaciones.isStringValido(titulo)) {
+            throw new ValidacionException("El título no puede estar vacío.");
+        }
+        if (duracion <= 0) {
+            throw new ValidacionException("La duración debe ser positiva.");
+        }
+
+        int minDuracion = 60;
+        int maxDuracion = 300;
+
+        // Usamos el validador de rango
+        if (!Validaciones.isRangoValido(duracion, minDuracion, maxDuracion)) {
+            throw new ValidacionException("Error: La duración debe ser un valor lógico (entre " + minDuracion + " y " + maxDuracion + " minutos).");
+        }
+
+
+        // Validación de negocio (regla de duplicados)
+        if (buscarPeliculaPorTitulo(titulo) != null) {
+            throw new ValidacionException("Ya existe una película con el título: " + titulo);
+        }
+
+        Pelicula nueva = new Pelicula(duracion, genero,  precioBase ,titulo);
+        repoPeliculas.agregarPelicula(nueva);
+        guardarPeliculas(); // Persiste el cambio en el JSON
+    }
+
+    public Pelicula buscarPelicula(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+        return repoPeliculas.buscarElemento(id);
+    }
+
+    public Pelicula buscarPeliculaPorTitulo(String titulo) {
+        for (Pelicula p : repoPeliculas.getListaPeliculas()) {
+            if (p.getTitulo().equalsIgnoreCase(titulo.trim())) {
+                return p;
+            }
+        }
+        return null; // No se encontró
+    }
+
+    public ArrayList<Pelicula> getListaPeliculas() {
+        return repoPeliculas.getListaPeliculas();
+    }
+
+    public void eliminarPelicula(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+        repoPeliculas.EliminarPelicula(id);
+        guardarPeliculas();
+    }
+
+    // --- API de SALAS ---
+
+    /**
+     * Valida y crea una nueva sala.
+     * Lanza excepciones si la capacidad es inválida o el número de sala ya existe.
+     */
+    public void crearSala(int numSala, int capacidad, boolean es3D)
+            throws ValidacionException, ElementoRepetido, VerificarNulo {
+
+        if (capacidad <= 0) {
+            throw new ValidacionException("La capacidad debe ser positiva.");
+        }
+        if (buscarSalaPorNumero(numSala) != null) {
+            throw new ValidacionException("Ya existe una sala con el número " + numSala);
+        }
+
+        Sala nueva = new Sala(numSala,  capacidad, es3D);
+        repoSalas.agregarSala(nueva);
+        guardarSalas(); // Persiste el cambio en el JSON
+    }
+
+    public Sala buscarSala(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+        return repoSalas.buscarSala(id);
+    }
+
+    public Sala buscarSalaPorNumero(int numSala) {
+        for (Sala s : repoSalas.getListaSalas()) {
+            if (s.getNumSala() == numSala) {
+                return s;
+            }
+        }
+        return null; // No se encontró
+    }
+
+    public ArrayList<Sala> getListaSalas() {
+        return repoSalas.getListaSalas();
+    }
+
+    public void eliminarSala(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+        repoSalas.eliminarSala(id);
+        guardarSalas();
+    }
+
+    // --- API de FUNCIONES (Lógica de negocio principal) ---
+
+    /**
+     * Valida y crea una nueva función.
+     * Lanza excepciones si la película/sala no existen o si el horario se superpone.
+     */
+    public void crearFuncion(String idPelicula, String idSala, LocalDateTime fechaHora)
+            throws ValidacionException, ElementoRepetido, VerificarNulo, ElementoNoExiste {
+
+        // 1. Valida que los IDs existan
+        Pelicula p = repoPeliculas.buscarElemento(idPelicula);
+        Sala s = repoSalas.buscarSala(idSala);
+
+        // 2. Valida la lógica de negocio (superposición de horarios)
+        ArrayList<Funcion> funcionesDeLaSala = buscarFuncionesPorSala(idSala);
+        for (Funcion f : funcionesDeLaSala) {
+
+            // Lógica simple de superposición (misma hora de inicio)
+            // (Se puede mejorar sumando la duración de la película)
+            if (f.getHorario().isEqual(fechaHora)) {
+                throw new ValidacionException("Horario superpuesto en la sala " + s.getNumSala());
+            }
+        }
+
+        // 3. Si todo OK, crea la función
+        // La función hereda la capacidad total de la sala al crearse
+        Funcion nueva = new Funcion(idPelicula, idSala, fechaHora, s.getCapacidadTotal());
+        repoFunciones.agregarFuncion(nueva);
+        guardarFunciones(); // Persiste el cambio
+    }
+
+    public Funcion buscarFuncion(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+        return repoFunciones.buscarFuncion(id);
+    }
+
+    public ArrayList<Funcion> buscarFuncionesPorSala(String idSala) {
+        ArrayList<Funcion> filtradas = new ArrayList<>();
+        for (Funcion f : repoFunciones.getListaFunciones()) {
+            if (f.getIdSala().equals(idSala)) {
+                filtradas.add(f);
+            }
+        }
+        return filtradas;
+    }
+
+    public ArrayList<Funcion> getListaFunciones() {
+        return repoFunciones.getListaFunciones();
+    }
+
+    public void eliminarFuncion(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+        repoFunciones.eliminarFuncion(id);
+        guardarFunciones();
+    }
+
+
+    // --- 4. MÉTODOS PRIVADOS DE CARGA/GUARDADO ---
+
+    // --- Métodos de Guardado ---
+    public void guardarPeliculas() {
+        JsonUtiles.grabarUnJson(repoPeliculas.ArregloDePeliculas(), ARCHIVO_PELICULAS);
+    }
+    public void guardarSalas() {
+        JsonUtiles.grabarUnJson(repoSalas.ArregloDeSalas(), ARCHIVO_SALAS);
+    }
+    public void guardarFunciones() {
+        JsonUtiles.grabarUnJson(repoFunciones.ArregloDeFunciones(), ARCHIVO_FUNCIONES);
+    }
+
+    // --- Métodos de Carga (Llamados por el constructor) ---
+    private void cargarPeliculas() {
+        JSONTokener tokener = JsonUtiles.leerUnJson(ARCHIVO_PELICULAS);
+        if (tokener != null) {
+            try {
+                JSONArray jsonArray = new JSONArray(tokener);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = jsonArray.getJSONObject(i);
+                    Pelicula p = Pelicula.traerDesdeJson(obj);
+                    repoPeliculas.agregarPelicula(p);
+                }
+            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_PELICULAS + " corrupto o error al cargar."); }
+        }
+    }
+
+    private void cargarSalas() {
+        JSONTokener tokener = JsonUtiles.leerUnJson(ARCHIVO_SALAS);
+        if (tokener != null) {
+            try {
+                JSONArray jsonArray = new JSONArray(tokener);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = jsonArray.getJSONObject(i);
+                    Sala s = Sala.traerDesdeJson(obj);
+                    repoSalas.agregarSala(s);
+                }
+            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_SALAS + " corrupto o error al cargar."); }
+        }
+    }
+
+    private void cargarFunciones() {
+        JSONTokener tokener = JsonUtiles.leerUnJson(ARCHIVO_FUNCIONES);
+        if (tokener != null) {
+            try {
+                JSONArray jsonArray = new JSONArray(tokener);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject obj = jsonArray.getJSONObject(i);
+                    Funcion f = Funcion.traerDesdeJson(obj);
+                    repoFunciones.agregarFuncion(f);
+                }
+            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_FUNCIONES + " corrupto o error al cargar."); }
+        }
+    }
+
+    /**
+     * Recibe el ID de una función y devuelve un String "bonito"
+     * con los detalles (título, sala, hora) conectando los repositorios.
+     * * @param idFuncion El ID de la función a detallar.
+     * @return Un String formateado con los detalles.
+     * @throws ElementoNoExiste Si la función, película o sala no se encuentran.
+     */
+    public String getDetalleFuncion(String idFuncion)
+            throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+
+        // 1. Buscar los 3 objetos necesarios
+        Funcion funcion = this.repoFunciones.buscarFuncion(idFuncion);
+        Pelicula pelicula = this.repoPeliculas.buscarElemento(funcion.getIdPelicula());
+        Sala sala = this.repoSalas.buscarSala(funcion.getIdSala());
+
+        // 2. Formatear la hora para que sea legible
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM 'a las' HH:mm 'hs'");
+        String horarioFormateado = funcion.getHorario().format(formato);
+
+        // 3. Armar el String final (en un solo renglón para la lista)
+        // Ej: "🎬 Oppenheimer | Sala 3 | 20/11 a las 19:30 hs | 50 asientos disp."
+        String detalle = String.format("🎬 %s | Sala %d | %s | %d asientos disp.",
+                pelicula.getTitulo(),
+                sala.getNumSala(),
+                horarioFormateado,
+                funcion.getAsientosDisponibles()
+        );
+
+        return detalle;
+    }
+
+
+}

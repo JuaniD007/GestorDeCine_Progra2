@@ -1,63 +1,56 @@
 package Models;
+import Contenedoras.GestorUsuario;
+import Contenedoras.GestorDeCatalogo;
+import Contenedoras.GestorDeVentas;
+import Excepciones.*;
+import Enum.*;
+import UI.Menu;
 
-import Contenedoras.RepositorioCliente;
-import Contenedoras.RepositorioPelicula;
+/**
+ * Clase principal que "posee" y "conecta" todos los sistemas del cine.
+ * Su única responsabilidad es inicializar los gestores y el menú.
+ */
+public class Cine {
 
-import java.util.HashMap;
+    // 1. Los 3 "Cerebros" (Gestores)
+    private GestorUsuario gestorUsuario;
+    private GestorDeCatalogo gestorDeCatalogo; /// es el que gestiona la cartelera
+    private GestorDeVentas gestorDeVentas;
 
-public class Cine
-{
+
+    // 2. La "Interfaz" (Consola)
+    private Menu menu;
+
     private String nombreCine;
-    private RepositorioCliente cliente;
-    private RepositorioPelicula repositorioPelicula;
-    private HashMap<Integer, Sala> funcionesPorSala;
 
-    public Cine(RepositorioCliente cliente, String nombreCine, RepositorioPelicula repositorioPelicula) {
-        this.cliente = cliente;
-        this.funcionesPorSala = new HashMap<>();
+    /**
+     * El constructor del Cine crea e inicializa todos los sistemas.
+     */
+    public Cine(String nombreCine) {
         this.nombreCine = nombreCine;
-        this.repositorioPelicula = repositorioPelicula;
+
+        // 3. Inicia los cerebros (Esto carga todos los JSON en memoria)
+        this.gestorUsuario = new GestorUsuario();
+        this.gestorDeCatalogo = new GestorDeCatalogo();
+
+        // 4. El GestorDeVentas necesita al GestorDeCatalogo
+        //    para poder buscar funciones, validar asientos, etc.
+        this.gestorDeVentas = new GestorDeVentas(this.gestorDeCatalogo);
+
+        this.menu = new Menu(gestorUsuario, gestorDeCatalogo, gestorDeVentas);
+
+        // 5. Inicia la interfaz y le pasa los cerebros para que los use
+//        this.menu = new Menu(gestorUsuario, gestorDeCatalogo, gestorDeVentas);
     }
 
-    public RepositorioCliente getCliente() {
-        return cliente;
-    }
-
-    public void setCliente(RepositorioCliente cliente) {
-        this.cliente = cliente;
-    }
-
-    public HashMap<Integer, Sala> getFuncionesPorSala() {
-        return funcionesPorSala;
-    }
-
-    public void setFuncionesPorSala(HashMap<Integer, Sala> funcionesPorSala) {
-        this.funcionesPorSala = funcionesPorSala;
-    }
-
-    public String getNombreCine() {
-        return nombreCine;
-    }
-
-    public void setNombreCine(String nombreCine) {
-        this.nombreCine = nombreCine;
-    }
-
-    public RepositorioPelicula getRepositorioPelicula() {
-        return repositorioPelicula;
-    }
-
-    public void setRepositorioPelicula(RepositorioPelicula repositorioPelicula) {
-        this.repositorioPelicula = repositorioPelicula;
-    }
-
-    @Override
-    public String toString() {
-        return "Cine{" +
-                "cliente=" + cliente +
-                ", nombreCine='" + nombreCine + '\'' +
-                ", repositorioPelicula=" + repositorioPelicula +
-                ", funcionesPorSala=" + funcionesPorSala +
-                '}';
+    /**
+     * Método que "enciende" el cine.
+     * Llama al bucle principal del menú.
+     */
+    public void iniciar() {
+      System.out.println("--- BIENVENIDO A " + this.nombreCine.toUpperCase() + " ---");
+        this.menu.mostrarMenuPrincipal();
+       System.out.println("\n--- Gracias por visitar " + this.nombreCine + " ---");
     }
 }
+

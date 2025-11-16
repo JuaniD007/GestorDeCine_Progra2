@@ -1,101 +1,169 @@
 package Models;
 
-import Interfaces.IPagable;
+import Interfaces.IIdentificable;
+import Interfaces.ItoJson;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Objects;
+import java.time.LocalDateTime; // <-- Importado
+import java.util.ArrayList;
+import java.util.Objects; // <-- Importado
+import java.util.UUID;    // <-- Importado
 
-public class Funcion   {
-    private Pelicula pelicula;
-    private Sala sala;
-    private LocalDate horario;
-    private HashMap <Integer, Cliente> butacaOcupadas;
+public class Funcion implements ItoJson, IIdentificable {
+    private String id;
+    private String idPelicula;
+    private String idSala;
+    private LocalDateTime horario;
+    private ArrayList<Integer> asientosOcupados;
+    private int capacidadTotal;
 
-    public Funcion( LocalDate horario, Pelicula pelicula, Sala sala) {
-        this.butacaOcupadas = new HashMap<>();
-        this.horario = horario;
-        this.pelicula = pelicula;
-        this.sala = sala;
+    public Funcion(String idPelicula, String idSala, LocalDateTime fechaHora, int capacidadTotal) {
+        this.id = UUID.randomUUID().toString().substring(0, 8);
+        this.idPelicula = idPelicula;
+        this.idSala = idSala;
+        this.horario = fechaHora;
+        this.capacidadTotal = capacidadTotal;
+        this.asientosOcupados = new ArrayList<>(); // Inicia vacío
     }
-    public Funcion(){}
-    public HashMap<Integer, Cliente> isButacaOcupadas() {
-        return butacaOcupadas;
+
+    // Constructor vacío para JSON
+    public Funcion() {
+        this.asientosOcupados = new ArrayList<>();
     }
 
-    public void setButacaOcupadas(HashMap<Integer, Cliente> butacaOcupadas) {
-        this.butacaOcupadas = butacaOcupadas;
+    // --- Getters ---
+    @Override
+    public String getId() {
+        return id;
     }
 
-    public LocalDate getHorario() {
+    public String getIdPelicula() {
+        return idPelicula;
+    }
+
+    public String getIdSala() {
+        return idSala;
+    }
+
+    public LocalDateTime getHorario() {
         return horario;
     }
 
-    public void setHorario(LocalDate horario) {
+    public int getCapacidadTotal() {
+        return capacidadTotal;
+    }
+
+    public int getAsientosDisponibles() {
+        return capacidadTotal - asientosOcupados.size();
+    }
+
+    public ArrayList<Integer> getAsientosOcupados() {
+        return asientosOcupados;
+    }
+
+    // --- MÉTODOS DE LÓGICA (para el Gestor) ---
+    public boolean isAsientoOcupado(int numAsiento) {
+        return asientosOcupados.contains(numAsiento);
+    }
+
+    public void ocuparAsiento(int numAsiento) {
+        this.asientosOcupados.add(numAsiento);
+    }
+
+    // --- Setters (para traerDesdeJson) ---
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public void setIdPelicula(String idPelicula) {
+        this.idPelicula = idPelicula;
+    }
+
+    public void setIdSala(String idSala) {
+        this.idSala = idSala;
+    }
+
+    public void setHorario(LocalDateTime horario) {
         this.horario = horario;
     }
 
-    public Pelicula getPelicula() {
-        return pelicula;
+    public void setAsientosOcupados(ArrayList<Integer> asientosOcupados) {
+        this.asientosOcupados = asientosOcupados;
     }
 
-    public void setPelicula(Pelicula pelicula) {
-        this.pelicula = pelicula;
+    public void setCapacidadTotal(int capacidadTotal) {
+        this.capacidadTotal = capacidadTotal;
     }
 
-    public Sala getSala() {
-        return sala;
-    }
-
-    public void setSala(Sala sala) {
-        this.sala = sala;
-    }
-
-
-
-    @Override
-    public String toString() {
-        return "Funcion{" +
-                "butacaOcupadas=" + butacaOcupadas +
-                ", pelicula=" + pelicula +
-                ", sala=" + sala +
-                ", horario=" + horario +
-                '}';
-    }
-
+    // --- Equals y HashCode (necesarios para el Repositorio) ---
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Funcion funcion)) return false;
-        return Objects.equals(horario, funcion.horario);
+        if (o == null || getClass() != o.getClass()) return false;
+        Funcion funcion = (Funcion) o;
+        return Objects.equals(id, funcion.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(horario);
+        return Objects.hash(id);
     }
 
-    public boolean ButacaOcupada ( int numButaca){
-        return butacaOcupadas.containsKey(numButaca);
-    }
-    public boolean ocuparButaca(int nroButaca, Cliente cliente) {
-        if (!ButacaOcupada(nroButaca)) { // si no esta ocupada...
-            butacaOcupadas.put(nroButaca, cliente);
-            return true;
+
+    // --- JSON (Ahora guarda la lista de asientos) ---
+    @Override
+    public JSONObject toJson() {
+        JSONObject json = new JSONObject();
+        try {
+            // --- Campos que faltaban ---
+            json.put("id", this.id);
+            json.put("idPelicula", this.idPelicula);
+            json.put("idSala", this.idSala);
+            json.put("horario", this.horario.toString());
+            // ---
+            json.put("capacidadTotal", capacidadTotal);
+            json.put("asientosOcupados", new JSONArray(this.asientosOcupados));
+
+        } catch (JSONException e) {
+            e.printStackTrace();
         }
-        return false; // ya estaba ocupada
+        return json;
     }
-    public int butacasDisponibles() {
-        int total = sala.getCapacidadTotal();
-        int ocupadas = butacaOcupadas.size();
-        return total - ocupadas;
+
+    public static Funcion traerDesdeJson(JSONObject obj) {
+        Funcion f = new Funcion();
+        try {
+            // --- Campos que faltaban ---
+            f.setId(obj.getString("id"));
+            f.setIdPelicula(obj.getString("idPelicula"));
+            f.setIdSala(obj.getString("idSala"));
+            f.setHorario(LocalDateTime.parse(obj.getString("horario")));
+            // ---
+            f.setCapacidadTotal(obj.getInt("capacidadTotal"));
+
+            // Reconstruimos el ArrayList<Integer> desde el JSONArray
+            JSONArray asientosJSON = obj.getJSONArray("asientosOcupados");
+            ArrayList<Integer> asientos = new ArrayList<>();
+            for (int i = 0; i < asientosJSON.length(); i++) {
+                asientos.add(asientosJSON.getInt(i));
+            }
+            f.setAsientosOcupados(asientos);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return f;
     }
-    public String mostrarDetalleFuncion() {
-        return ("🎬 FUNCION DETALLE 🎬")+
-        ("Pelicula: " + (pelicula != null ? pelicula.getTitulo() : "No asignada"))+
-        ("Sala: " + (sala != null ? sala.getNumSala() : "No asignada"))+
-      ("Horario: " + horario)+
-      ("Butacas ocupadas: " + butacaOcupadas.size())+
-      ("Butacas disponibles: " + butacasDisponibles());
-    }
+
+
+    //    public String mostrarDetalleFuncion() {
+    //        return ("🎬 FUNCION DETALLE 🎬")+
+    //        ("Pelicula: " + (pelicula != null ? pelicula.getTitulo() : "No asignada"))+
+    //        ("Sala: " + (sala != null ? sala.getNumSala() : "No asignada"))+
+    //      ("Horario: " + horario)+
+    //      ("Butacas ocupadas: " + butacaOcupadas.size())+
+    //      ("Butacas disponibles: " + butacasDisponibles());
+    //    }
 }
