@@ -284,6 +284,9 @@ public class Menu {
                   uiListarPeliculasCliente();
                     break;
                 case 4 :
+
+                    uiPagarReserva();
+
                     break;
                 case 9:
                     System.out.println("Cerrando sesión de cliente...");
@@ -522,9 +525,31 @@ public class Menu {
             // (Aquí podrías agregar lógica extra, ej: if (sala.is3D()) precioACobrar *= 1.25;)
 
             System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
-            System.out.print("¿Confirmar compra? (S/N): ");
-            String confirmacion = scanner.nextLine();
 
+
+            // --- ¡AQUÍ ESTÁ LA VALIDACIÓN QUE PEDISTE! ---
+            String confirmacion = "";
+            boolean entradaValida = false;
+
+            // Bucle 'while' que se repite hasta que la entrada sea 'S' o 'N'
+            while (!entradaValida) {
+                System.out.print("¿Confirmar Reserva? (S/N): ");
+                confirmacion = scanner.nextLine();
+
+                // .toUpperCase() convierte "s" en "S" y "n" en "N"
+                // .equals() comprueba si es S o N
+                if (confirmacion.toUpperCase().equals("S") || confirmacion.toUpperCase().equals("N")) {
+                    entradaValida = true; // La entrada es válida, salimos del bucle
+                } else {
+                    // Si no es S o N, mostramos error y el bucle se repite
+                    System.err.println("Error: Por favor, ingrese solo 'S' o 'N'.");
+                }
+            }
+            // --- FIN DE LA VALIDACIÓN ---
+
+
+            // 7. VERIFICAR CONFIRMACIÓN
+            // Usamos .equalsIgnoreCase() para ser flexibles (acepta 's' o 'S')
             if (!confirmacion.equalsIgnoreCase("S")) {
                 System.out.println("Compra cancelada.");
                 return;
@@ -540,7 +565,6 @@ public class Menu {
             System.err.println("Error al crear la reserva: " + e.getMessage());
         }
     }
-
     private void uiVerMisReservas() {
         System.out.println("\n--- Mis Reservas ---");
         // El Gestor de Ventas filtra las reservas por el ID del cliente logueado
