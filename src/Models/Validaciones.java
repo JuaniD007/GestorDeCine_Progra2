@@ -51,8 +51,6 @@ public class Validaciones {
     }
 
 
-        ///  validar que el horario de la pelicula en la misma sala no coincidan. y no te deje agregar el mismo horario
-
 
 
 

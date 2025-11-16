@@ -6,12 +6,32 @@
         "duracion": 120,
         "idPelicula": "b83977b3"
     },
-
     {
         "precioBase": 7500,
         "genero": "ACCION",
         "titulo": "Exterminio 3",
         "duracion": 90,
         "idPelicula": "667566a1"
+    },
+    {
+        "precioBase": 2000,
+        "genero": "FICCION",
+        "titulo": "Interestelar",
+        "duracion": 140,
+        "idPelicula": "6c6669df"
+    },
+    {
+        "precioBase": 2999,
+        "genero": "COMEDIA",
+        "titulo": "Mi villano Favorito 2",
+        "duracion": 120,
+        "idPelicula": "6b349794"
+    },
+    {
+        "precioBase": 3000,
+        "genero": "ACCION",
+        "titulo": "ad",
+        "duracion": 120,
+        "idPelicula": "166dd5b9"
     }
 ]

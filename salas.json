@@ -1,14 +1,6 @@
-[
-    {
-        "es3D": true,
-        "numSala": 1,
-        "id": "d6103f6b",
-        "capacidadTotal": 80
-    },
-    {
-        "es3D": false,
-        "numSala": 2,
-        "id": "1e24f203",
-        "capacidadTotal": 55
-    }
-]
+[{
+    "es3D": true,
+    "numSala": 1,
+    "id": "d6103f6b",
+    "capacidadTotal": 80
+}]
