@@ -17,7 +17,7 @@ public abstract class Usuario implements ItoJson, IIdentificable {
     protected String contrasenia;
 
     public Usuario( String nombre, String dni, int edad, String email, String contrasenia) {
-        this.id = UUID.randomUUID().toString(); // Genera ID único
+        this.id = UUID.randomUUID().toString().substring(0, 8); // Genera ID único
         this.nombre = nombre;
         this.dni = dni;
         this.edad = edad;

@@ -6,6 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class Pelicula implements ItoJson, IIdentificable {
 
@@ -15,10 +16,10 @@ public class Pelicula implements ItoJson, IIdentificable {
     private int duracion;
     private double precioBase;
 
-    public Pelicula(int duracion, Genero genero, String id, double precioBase, String titulo) {
+    public Pelicula(int duracion, Genero genero, double precioBase, String titulo) {
         this.duracion = duracion;
         this.genero = genero;
-        this.id= id;
+        this.id= UUID.randomUUID().toString().substring(0, 8); // Un ID corto;
         this.precioBase = precioBase;
         this.titulo = titulo;
     }
@@ -78,23 +79,27 @@ public class Pelicula implements ItoJson, IIdentificable {
 
     @Override
     public String toString() {
-        return "Pelicula{" +
-                "duracion=" + duracion +
-                ", idPelicula=" + id +
-                ", titulo='" + titulo + '\'' +
-                ", genero=" + genero +
-                ", precioBase=" + precioBase +
-                '}';
+        String tituloStr = (this.titulo != null) ? this.titulo : "Sin Título";
+        String generoStr = (this.genero != null) ? this.genero.name() : "Sin Género";
+        String idStr = (this.id != null) ? this.id : "NO-ID";
+
+        // Formato: [ID: abc-123]   "Título de la Película" (Género) - 120 min.
+        return String.format("[ID: %s] \t\"%s\" (%s) - %d min.",
+                idStr,
+                tituloStr,
+                generoStr,
+                this.duracion
+        );
     }
 
     public JSONObject toJson (){
         JSONObject j = new JSONObject();
         try {
             j.put("titulo", this.titulo);
-            j.put("genero", this.genero);
+            j.put("genero", this.genero.name());
             j.put("duracion", this.duracion);
-            j.put("idpelicula", this.id);
-            j.put("precio base", this.precioBase);
+            j.put("idPelicula", this.id);
+            j.put("precioBase", this.precioBase);
 
         } catch (JSONException e) {
                e.printStackTrace();
@@ -105,7 +110,7 @@ public class Pelicula implements ItoJson, IIdentificable {
     public static Pelicula traerDesdeJson (JSONObject o ){
         Pelicula p = new Pelicula();
         try{
-            p.setPrecioBase(o.getDouble("precio base"));
+            p.setPrecioBase(o.getDouble("precioBase"));
             p.setDuracion(o.getInt("duracion"));
             p.setId(o.getString("idPelicula"));
             p.setTitulo(o.getString("titulo"));

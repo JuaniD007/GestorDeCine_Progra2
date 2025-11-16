@@ -18,7 +18,7 @@ public class RepositorioUsuario <T extends Usuario>   {
         Administrador admin = new Administrador(
                 "Admin General",   // nombre
                 "11111111",        // dni
-                99,                // edad (una edad simbólica)
+                18,                // edad (una edad simbólica)
                 "admin@cine.com",  // email (necesita uno, puedes inventarlo)
                 "admin"            // contrasenia
         );
@@ -60,7 +60,23 @@ public class RepositorioUsuario <T extends Usuario>   {
     }
 
 
+    /**
+     * Busca un usuario por su email.
+     * Devuelve el usuario (T) si lo encuentra, o null si no.
+     */
+    public T buscarUsuarioPorEmail(String email) {
+        if (email == null || email.isEmpty()) {
+            return null;
+        }
 
+        for (T usuario : getUsuarios().values()) {
+            if (usuario.getEmail().equalsIgnoreCase(email.trim())) {
+                return usuario; // ¡Encontrado!
+            }
+        }
+
+        return null; // No encontrado
+    }
 
 }
 

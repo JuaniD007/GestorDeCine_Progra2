@@ -4,11 +4,22 @@ import java.util.regex.Pattern;
 
 public class Validaciones {
 
-
-
     public static boolean isStringValido(String texto) {
+
         return texto != null && !texto.trim().isEmpty();
     }
+
+    public static boolean isNombreValido(String nombre) {
+        if (!isStringValido(nombre)) {
+            return false;
+        }
+        // Esta expresión regular (regex) comprueba que el String
+        // contenga solo letras (mayúsculas o minúsculas) y espacios.
+         String regex = "^[\\p{L} ]+$";
+
+        return Pattern.matches(regex, nombre.trim());
+    }
+
 
     /**
      * Comprueba si un DNI tiene formato numérico.
@@ -38,6 +49,10 @@ public class Validaciones {
     public static boolean isRangoValido(int valor, int min, int max) {
         return valor >= min && valor <= max;
     }
+
+
+        ///  validar que el horario de la pelicula en la misma sala no coincidan. y no te deje agregar el mismo horario
+
 
 
 
