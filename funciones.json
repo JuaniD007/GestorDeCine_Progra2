@@ -19,7 +19,9 @@
         "asientosOcupados": [
             5,
             45,
-            12
+            12,
+            1,
+            2
         ],
         "horario": "2025-11-20T11:30",
         "id": "eb5a67b7",
@@ -28,7 +30,7 @@
         "capacidadTotal": 80
     },
     {
-        "asientosOcupados": [],
+        "asientosOcupados": [27],
         "horario": "2025-11-20T19:30",
         "id": "fd189beb",
         "idPelicula": "667566a1",
@@ -36,7 +38,7 @@
         "capacidadTotal": 80
     },
     {
-        "asientosOcupados": [],
+        "asientosOcupados": [45],
         "horario": "2025-11-19T15:30",
         "id": "010679bd",
         "idPelicula": "6c6669df",

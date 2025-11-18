@@ -1,5 +1,14 @@
 [
     {
+        "tipo": "Cliente",
+        "contrasenia": "123",
+        "id": "96e460cc",
+        "nombre": "pepeArg",
+        "edad": 31,
+        "dni": "1",
+        "email": "pepe@pepe.com"
+    },
+    {
         "tipo": "Administrador",
         "contrasenia": "admin",
         "id": "a6bc7d9c",
