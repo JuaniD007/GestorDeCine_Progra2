@@ -21,17 +21,24 @@
         "idPelicula": "6c6669df"
     },
     {
-        "precioBase": 3000,
-        "genero": "ACCION",
-        "titulo": "ad",
-        "duracion": 120,
-        "idPelicula": "166dd5b9"
-    },
-    {
         "precioBase": 1200,
         "genero": "COMEDIA",
         "titulo": "Los Simpsons",
         "duracion": 100,
         "idPelicula": "1af4eece"
+    },
+    {
+        "precioBase": 3000,
+        "genero": "FICCION",
+        "titulo": "Harry Potter y La Piedra Filosofal",
+        "duracion": 120,
+        "idPelicula": "efb23ed0"
+    },
+    {
+        "precioBase": 2000,
+        "genero": "DRAMA",
+        "titulo": "Gitano",
+        "duracion": 110,
+        "idPelicula": "15504b02"
     }
 ]

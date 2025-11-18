@@ -10,6 +10,7 @@ import Excepciones.*;
 
 import javax.print.attribute.standard.JobSheets;
 import java.util.regex.Pattern;
+
 // Se elimina la importación de Scanner ya que no se usa para leer entrada
 // en esta versión refactorizada de la clase de lógica.
 

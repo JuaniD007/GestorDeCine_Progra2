@@ -62,6 +62,7 @@ public class Funcion implements ItoJson, IIdentificable {
         return asientosOcupados.contains(numAsiento);
     }
 
+
     public void ocuparAsiento(int numAsiento) {
         this.asientosOcupados.add(numAsiento);
     }

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
 
 
-public class GestorDeCatalogo {
+public class GestorDeCartelera {
 
     // --- 1. ATRIBUTOS (Maneja 3 repositorios) ---
     private RepositorioPelicula repoPeliculas;
@@ -26,7 +26,7 @@ public class GestorDeCatalogo {
     private static final String ARCHIVO_FUNCIONES = "funciones.json";
 
     // --- 2. CONSTRUCTOR (Carga los 3 JSON al iniciar) ---
-    public GestorDeCatalogo() {
+    public GestorDeCartelera() {
         // Inicializa los "almacenes" de memoria
         this.repoPeliculas = new RepositorioPelicula();
         this.repoSalas = new RepositorioSala();
@@ -151,7 +151,6 @@ public class GestorDeCatalogo {
             throws ValidacionException, ElementoRepetido, VerificarNulo, ElementoNoExiste {
 
         // --- 1. BUSCAR OBJETOS PRINCIPALES ---
-        // (Esto es lo que ya teníamos)
         Pelicula peliculaNueva;
         Sala sala;
         try {
@@ -162,7 +161,6 @@ public class GestorDeCatalogo {
         }
 
         // --- 2. DEFINIR RANGO DE LA NUEVA FUNCIÓN ---
-        // (Aquí usamos la duración de la película)
         LocalDateTime inicioNueva = fechaHora;
         long duracionNueva = peliculaNueva.getDuracion(); // Ej: 120 minutos
         LocalDateTime finNueva = inicioNueva.plusMinutes(duracionNueva);
@@ -323,6 +321,7 @@ public class GestorDeCatalogo {
 
 
     public ArrayList<Funcion> getFuncionesDisponiblesParaVenta() {
+
         ArrayList<Funcion> filtradas = new ArrayList<>();
         LocalDateTime ahora = LocalDateTime.now();
 

@@ -10,5 +10,11 @@
         "numSala": 2,
         "id": "10a6b4cb",
         "capacidadTotal": 100
+    },
+    {
+        "es3D": false,
+        "numSala": 3,
+        "id": "411b75f6",
+        "capacidadTotal": 50
     }
 ]

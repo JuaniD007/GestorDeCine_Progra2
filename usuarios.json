@@ -20,10 +20,28 @@
     {
         "tipo": "Cliente",
         "contrasenia": "1234",
+        "id": "5d0d63f0",
+        "nombre": "Johana",
+        "edad": 21,
+        "dni": "12345678",
+        "email": "johana@gmail.com"
+    },
+    {
+        "tipo": "Cliente",
+        "contrasenia": "1234",
         "id": "ce128173",
         "nombre": "Juan Ignacio",
         "edad": 21,
         "dni": "44831001",
         "email": "juanid2003@gmail.com"
+    },
+    {
+        "tipo": "Cliente",
+        "contrasenia": "1234",
+        "id": "e3fb571a",
+        "nombre": "Agostina",
+        "edad": 21,
+        "dni": "87654321",
+        "email": "Agostina@gmail.com"
     }
 ]

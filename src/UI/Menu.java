@@ -1,5 +1,5 @@
 package UI;
-import Contenedoras.GestorDeCatalogo;
+import Contenedoras.GestorDeCartelera;
 import Contenedoras.GestorDeVentas;
 import Contenedoras.GestorUsuario;
 import Models.*;
@@ -17,7 +17,7 @@ public class Menu {
 
     // --- Los 3 "Cerebros" (se reciben del Cine) ---
     private GestorUsuario gestorUsuario;
-    private GestorDeCatalogo gestorDeCatalogo;
+    private GestorDeCartelera gestorDeCartelera;
     private GestorDeVentas gestorDeVentas;
 
     private Scanner scanner;
@@ -26,9 +26,9 @@ public class Menu {
     /**
      * El constructor recibe los gestores (creados por la clase Cine)
      */
-    public Menu(GestorUsuario gestorUsuario, GestorDeCatalogo gestorDeCatalogo, GestorDeVentas gestorDeVentas) {
+    public Menu(GestorUsuario gestorUsuario, GestorDeCartelera gestorDeCartelera, GestorDeVentas gestorDeVentas) {
         this.gestorUsuario = gestorUsuario;
-        this.gestorDeCatalogo = gestorDeCatalogo;
+        this.gestorDeCartelera = gestorDeCartelera;
         this.gestorDeVentas = gestorDeVentas;
         this.scanner = new Scanner(System.in);
         this.usuarioLogueado = null;
@@ -169,7 +169,7 @@ public class Menu {
             String id = scanner.nextLine();
 
             // Llama al Gestor (que lanza excepciones si falla)
-            gestorDeCatalogo.eliminarPelicula(id);
+            gestorDeCartelera.eliminarPelicula(id);
 
             System.out.println("¡Película eliminada con éxito!");
 
@@ -189,7 +189,7 @@ public class Menu {
             System.out.print("Ingrese el ID de la Sala que desea ELIMINAR: ");
             String id = scanner.nextLine();
 
-            gestorDeCatalogo.eliminarSala(id);
+            gestorDeCartelera.eliminarSala(id);
             System.out.println("¡Sala eliminada con éxito!");
 
         } catch (Exception e) {
@@ -231,7 +231,7 @@ public class Menu {
             } else {
                 // 4. Si está libre (false), SÍ procedemos a borrar.
                 //    Llamamos al Gestor de Catálogo (el que sabe borrar funciones).
-                gestorDeCatalogo.eliminarFuncion(idFuncion);
+                gestorDeCartelera.eliminarFuncion(idFuncion);
                 System.out.println("¡Función eliminada con éxito!.");
             }
 
@@ -363,7 +363,7 @@ public class Menu {
 
     private void uiListarPeliculasCliente() {
         System.out.println("\n--- Películas en Cartelera ---");
-        ArrayList<Pelicula> lista = gestorDeCatalogo.getListaPeliculas();
+        ArrayList<Pelicula> lista = gestorDeCartelera.getListaPeliculas();
         if (lista.isEmpty()) {
             System.out.println("No hay películas cargadas en este momento.");
             return;
@@ -393,7 +393,7 @@ public class Menu {
             double precio = Double.parseDouble(scanner.nextLine());
 
             // Llama al Gestor
-            gestorDeCatalogo.crearPelicula(titulo, genero, duracion, precio);
+            gestorDeCartelera.crearPelicula(titulo, genero, duracion, precio);
             System.out.println("¡Película creada con éxito!");
 
         } catch (IllegalArgumentException e) {
@@ -413,7 +413,7 @@ public class Menu {
             System.out.print("¿Es 3D? (true/false): ");
             boolean es3D = Boolean.parseBoolean(scanner.nextLine());
 
-            gestorDeCatalogo.crearSala(numSala, capacidad, es3D);
+            gestorDeCartelera.crearSala(numSala, capacidad, es3D);
             System.out.println("¡Sala creada con éxito!");
 
         } catch (Exception e) {
@@ -453,7 +453,7 @@ public class Menu {
             // Combinamos la fecha y la hora en un solo objeto
             LocalDateTime fechaHoraCompleta = LocalDateTime.of(fecha, hora);
 
-            gestorDeCatalogo.crearFuncion(idPelicula, idSala, fechaHoraCompleta);
+            gestorDeCartelera.crearFuncion(idPelicula, idSala, fechaHoraCompleta);
             System.out.println("¡Función creada con éxito!");
 
         } catch (DateTimeParseException e) {
@@ -471,7 +471,7 @@ public class Menu {
         System.out.println("\n--- Comprar Entrada ---");
 
         // 1. OBTENEMOS LA LISTA DE FUNCIONES
-        ArrayList<Funcion> funcionesDisponibles = gestorDeCatalogo.getFuncionesDisponiblesParaVenta();
+        ArrayList<Funcion> funcionesDisponibles = gestorDeCartelera.getFuncionesDisponiblesParaVenta();
 
         if (funcionesDisponibles.isEmpty()) {
             System.out.println("No hay funciones programadas.");
@@ -488,7 +488,7 @@ public class Menu {
             String detalle = "";
             try {
                 // Obtenemos el detalle bonito (Ej: "Dune 2 | Sala 1...")
-                detalle = gestorDeCatalogo.getDetalleFuncion(f.getId());
+                detalle = gestorDeCartelera.getDetalleFuncion(f.getId());
             } catch (Exception e) {
                 detalle = "Error al cargar detalle de función " + f.getId();
             }
@@ -515,30 +515,50 @@ public class Menu {
 
 
             System.out.println("--- Las butacas ocupadas se veran con la cruz ---");
-            Sala sala = gestorDeCatalogo.buscarSala(funcionElegida.getIdSala());
 
 // Hacemos un bucle de 1 hasta la capacidad total
+            // 4. MAPA DE ASIENTOS (VISUAL CENTRADO)
+            Sala sala = gestorDeCartelera.buscarSala(funcionElegida.getIdSala());
+
+            System.out.println("\n");
+            // Dibujo de la Pantalla (Centrado manual con espacios)
+            System.out.println("                     ___________________________________");
+            System.out.println("                    |        PANTALLA DEL CINE          |");
+            System.out.println("                     ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
+            System.out.println("                                (FRENTE)\n");
+
+            int asientosPorFila = 10;
+            String margenIzquierdo = "                "; // El "padding" para centrar los asientos
+
+            // Imprimimos el margen de la primera fila
+            System.out.print(margenIzquierdo);
+
             for (int i = 1; i <= sala.getCapacidadTotal(); i++) {
 
-                // Chequeamos si el asiento 'i' está en la lista de ocupados
+                // Lógica visual: Ocupado vs Libre
                 if (funcionElegida.isAsientoOcupado(i)) {
-                    System.out.print("[ X ] "); // Ocupado
+                    System.out.print("[XX] "); // Ocupado (Marca visual clara)
                 } else {
-                    System.out.printf("[%2d] ", i); // Disponible (con formato)
+                    System.out.printf("[%02d] ", i); // Libre (con 0 a la izquierda: 01, 05, 10)
                 }
 
-                // Para que se vea como un cine (ej. 10 asientos por fila)
-                if (i % 10 == 0) {
-                    System.out.println("\n"); // Salto de línea
+                // Salto de línea al terminar la fila
+                if (i % asientosPorFila == 0) {
+                    System.out.println(); // Baja renglón
+                    // Si no es la última fila, imprime el margen para la siguiente
+                    if (i < sala.getCapacidadTotal()) {
+                        System.out.print(margenIzquierdo);
+                    }
                 }
             }
+            System.out.println("\n");
             System.out.println("\n------------------------");
             System.out.print("Ingrese el Número de Asiento (ej: 5): ");
             int numAsiento = Integer.parseInt(scanner.nextLine());
 
 
             // 6. El Menú ahora debe buscar la película para saber el precio
-            Pelicula pelicula = gestorDeCatalogo.buscarPelicula(funcionElegida.getIdPelicula());
+            Pelicula pelicula = gestorDeCartelera.buscarPelicula(funcionElegida.getIdPelicula());
             double precioACobrar = pelicula.getPrecioBase();
             // (Aquí podrías agregar lógica extra, ej: if (sala.is3D()) precioACobrar *= 1.25;)
 
@@ -618,7 +638,7 @@ public class Menu {
 
     private void uiListarPeliculas() {
         System.out.println("\n--- Listado de Películas ---");
-        ArrayList<Pelicula> lista = gestorDeCatalogo.getListaPeliculas();
+        ArrayList<Pelicula> lista = gestorDeCartelera.getListaPeliculas();
         if (lista.isEmpty()) {
             System.out.println("No hay películas cargadas.");
             return;
@@ -630,7 +650,7 @@ public class Menu {
 
     private void uiListarSalas() {
         System.out.println("\n--- Listado de Salas ---");
-        ArrayList<Sala> lista = gestorDeCatalogo.getListaSalas();
+        ArrayList<Sala> lista = gestorDeCartelera.getListaSalas();
         if (lista.isEmpty()) {
             System.out.println("No hay salas cargadas.");
             return;
@@ -648,7 +668,7 @@ public class Menu {
 
     private void uiListarFunciones() {
         System.out.println("\n--- Listado de Funciones ---");
-        ArrayList<Funcion> lista = gestorDeCatalogo.getListaFunciones();
+        ArrayList<Funcion> lista = gestorDeCartelera.getListaFunciones();
         if (lista.isEmpty()) {
             System.out.println("No hay funciones programadas.");
             return;
@@ -656,7 +676,7 @@ public class Menu {
         for (Funcion f : lista) {
             try {
                 // Pedimos al gestor que arme el detalle (esto es más lento pero más útil)
-                String detalle = gestorDeCatalogo.getDetalleFuncion(f.getId());
+                String detalle = gestorDeCartelera.getDetalleFuncion(f.getId());
                 System.out.println("ID: " + f.getId() + " | " + detalle);
                 System.out.println("-----");
             } catch (Exception e) {
@@ -683,7 +703,7 @@ public class Menu {
             String detalle = "";
             try {
                 // Obtenemos el detalle (Peli, Sala, Hora)
-                detalle = gestorDeCatalogo.getDetalleFuncion(r.getIdFuncion());
+                detalle = gestorDeCartelera.getDetalleFuncion(r.getIdFuncion());
             } catch (Exception e) {
                 detalle = "Error al cargar detalle de función.";
             }

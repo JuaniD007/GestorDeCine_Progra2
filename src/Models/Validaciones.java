@@ -28,7 +28,20 @@ public abstract class Validaciones {
         if (!isStringValido(dni)) {
             return false;
         }
-        return dni.trim().matches("\\d+"); // \d+ significa "uno o más dígitos"
+
+        String dniLimpo = dni.trim();
+
+        if(!dniLimpo.matches("\\d+")) {
+
+            return false;
+        }
+
+        if(!isRangoValido(dniLimpo.length(),4, 8)){
+
+            return false;
+        }
+
+        return true;
     }
 
     /**

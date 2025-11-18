@@ -1,6 +1,6 @@
 package Models;
+import Contenedoras.GestorDeCartelera;
 import Contenedoras.GestorUsuario;
-import Contenedoras.GestorDeCatalogo;
 import Contenedoras.GestorDeVentas;
 import UI.Menu;
 
@@ -12,7 +12,7 @@ public class Cine {
 
     // 1. Los 3 "Cerebros" (Gestores)
     private GestorUsuario gestorUsuario;
-    private GestorDeCatalogo gestorDeCatalogo; /// es el que gestiona la cartelera
+    private GestorDeCartelera gestorDeCartelera; /// es el que gestiona la cartelera
     private GestorDeVentas gestorDeVentas;
 
 
@@ -29,16 +29,16 @@ public class Cine {
 
         // 3. Inicia los cerebros (Esto carga todos los JSON en memoria)
         this.gestorUsuario = new GestorUsuario();
-        this.gestorDeCatalogo = new GestorDeCatalogo();
+        this.gestorDeCartelera = new GestorDeCartelera();
 
-        // 4. El GestorDeVentas necesita al GestorDeCatalogo
+        // 4. El GestorDeVentas necesita al GestorDeCartelera
         //    para poder buscar funciones, validar asientos, etc.
-        this.gestorDeVentas = new GestorDeVentas(this.gestorDeCatalogo);
+        this.gestorDeVentas = new GestorDeVentas(this.gestorDeCartelera);
 
-        this.menu = new Menu(gestorUsuario, gestorDeCatalogo, gestorDeVentas);
+        this.menu = new Menu(gestorUsuario, gestorDeCartelera, gestorDeVentas);
 
         // 5. Inicia la interfaz y le pasa los cerebros para que los use
-//        this.menu = new Menu(gestorUsuario, gestorDeCatalogo, gestorDeVentas);
+//        this.menu = new Menu(gestorUsuario, gestorDeCartelera, gestorDeVentas);
     }
 
     /**

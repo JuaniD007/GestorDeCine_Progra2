@@ -23,16 +23,16 @@ public class GestorDeVentas {
 
     // --- 1. ATRIBUTOS ---
     private RepositorioReserva repoReservas;
-    private GestorDeCatalogo gestorCatalogo; // <-- ¡El acoplamiento clave!
+    private GestorDeCartelera gestorCartelera; // <-- ¡El acoplamiento clave!
 
     private static final String ARCHIVO_RESERVAS = "reservas.json";
 
     // --- 2. CONSTRUCTOR ---
     /**
-     * El GestorDeVentas DEBE recibir al GestorDeCatalogo para funcionar.
+     * El GestorDeVentas DEBE recibir al GestorDeCartelera para funcionar.
      */
-    public GestorDeVentas(GestorDeCatalogo gestorCatalogo) {
-        this.gestorCatalogo = gestorCatalogo; // Lo guarda para usarlo después
+    public GestorDeVentas(GestorDeCartelera gestorCartelera) {
+        this.gestorCartelera = gestorCartelera; // Lo guarda para usarlo después
         this.repoReservas = new RepositorioReserva();
         cargarReservas();
     }
@@ -47,8 +47,8 @@ public class GestorDeVentas {
             throws ValidacionException, ElementoNoExiste, VerificarNulo, ElementoRepetido {
 
         // 1. Buscamos los objetos (usando el otro gestor)
-        Funcion funcion = gestorCatalogo.buscarFuncion(idFuncion);
-        Sala sala = gestorCatalogo.buscarSala(funcion.getIdSala());
+        Funcion funcion = gestorCartelera.buscarFuncion(idFuncion);
+        Sala sala = gestorCartelera.buscarSala(funcion.getIdSala());
 
         // 2. Validaciones de negocio
         if (numAsiento <= 0 || numAsiento > sala.getCapacidadTotal()) {
@@ -67,7 +67,7 @@ public class GestorDeVentas {
         funcion.ocuparAsiento(numAsiento);
 
         // B. ¡IMPORTANTE! Guardamos el cambio en el archivo de funciones
-        gestorCatalogo.guardarFunciones();
+        gestorCartelera.guardarFunciones();
 
         // C. Creamos la nueva reserva
         Reserva nuevaReserva = new Reserva(idCliente, idFuncion, numAsiento, LocalDate.now(), false, true, precioTotal ); // (pagado=false, activa=true)
@@ -76,6 +76,7 @@ public class GestorDeVentas {
         repoReservas.agregarReserva(nuevaReserva);
         guardarReservas();
     }
+
     public double pagarReserva(String idReserva)
             throws ValidacionException, ElementoNoExiste, VerificarNulo, ElementoRepetido {
 
@@ -136,9 +137,9 @@ public class GestorDeVentas {
 
         // 1. Buscar los 4 objetos (esto es igual)
         Reserva reserva = repoReservas.buscarReserva(idReserva);
-        Funcion funcion = gestorCatalogo.buscarFuncion(reserva.getIdFuncion());
-        Pelicula pelicula = gestorCatalogo.buscarPelicula(funcion.getIdPelicula());
-        Sala sala = gestorCatalogo.buscarSala(funcion.getIdSala());
+        Funcion funcion = gestorCartelera.buscarFuncion(reserva.getIdFuncion());
+        Pelicula pelicula = gestorCartelera.buscarPelicula(funcion.getIdPelicula());
+        Sala sala = gestorCartelera.buscarSala(funcion.getIdSala());
 
         // 2. Formatear
         DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -190,7 +191,7 @@ public class GestorDeVentas {
             // (Asumimos que la reserva tiene un getter 'isEstadoReserva()')
             if (r.getIdFuncion().equals(idFuncion) && r.isEstadoReserva()) {
 
-                // ¡Encontró una! Es peligroso borrar.
+                // Encontró una Es peligroso borrar.
                 return true;
             }
         }
