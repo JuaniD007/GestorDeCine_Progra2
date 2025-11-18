@@ -2,8 +2,6 @@ package Models;
 import Contenedoras.GestorUsuario;
 import Contenedoras.GestorDeCatalogo;
 import Contenedoras.GestorDeVentas;
-import Excepciones.*;
-import Enum.*;
 import UI.Menu;
 
 /**

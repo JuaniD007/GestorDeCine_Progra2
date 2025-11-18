@@ -1,38 +1,102 @@
 [
     {
-        "pagado": false,
+        "pagado": true,
         "idCliente": "ce128173",
         "idFuncion": "b9a5d1c4",
-        "numAsiento": 21,
-        "id": "501461d2",
+        "numAsiento": 23,
+        "id": "fa997bc3",
         "estadoReserva": true,
+        "precioTotal": 4000,
         "fechaReserva": "2025-11-16"
     },
     {
-        "pagado": false,
+        "pagado": true,
         "idCliente": "ce128173",
         "idFuncion": "b9a5d1c4",
+        "numAsiento": 22,
+        "id": "7b3afae5",
+        "estadoReserva": true,
+        "precioTotal": 4000,
+        "fechaReserva": "2025-11-16"
+    },
+    {
+        "pagado": true,
+        "idCliente": "ce128173",
+        "idFuncion": "eb5a67b7",
+        "numAsiento": 5,
+        "id": "4afaaaae",
+        "estadoReserva": true,
+        "precioTotal": 7500,
+        "fechaReserva": "2025-11-16"
+    },
+    {
+        "pagado": true,
+        "idCliente": "ce128173",
+        "idFuncion": "b9a5d1c4",
+        "numAsiento": 20,
+        "id": "0c9c027b",
+        "estadoReserva": true,
+        "precioTotal": 4000,
+        "fechaReserva": "2025-11-16"
+    },
+    {
+        "pagado": true,
+        "idCliente": "ce128173",
+        "idFuncion": "eb5a67b7",
+        "numAsiento": 45,
+        "id": "4dede071",
+        "estadoReserva": true,
+        "precioTotal": 7500,
+        "fechaReserva": "2025-11-16"
+    },
+    {
+        "pagado": true,
+        "idCliente": "ce128173",
+        "idFuncion": "eb5a67b7",
+        "numAsiento": 12,
+        "id": "96fd2d12",
+        "estadoReserva": true,
+        "precioTotal": 9375,
+        "fechaReserva": "2025-11-17"
+    },
+    {
+        "pagado": true,
+        "idCliente": "96e460cc",
+        "idFuncion": "010679bd",
+        "numAsiento": 45,
+        "id": "b079d263",
+        "estadoReserva": true,
+        "precioTotal": 2000,
+        "fechaReserva": "2025-11-18"
+    },
+    {
+        "pagado": true,
+        "idCliente": "96e460cc",
+        "idFuncion": "eb5a67b7",
         "numAsiento": 1,
-        "id": "116dc7c7",
+        "id": "b3c52145",
         "estadoReserva": true,
-        "fechaReserva": "2025-11-16"
+        "precioTotal": 9375,
+        "fechaReserva": "2025-11-18"
     },
     {
         "pagado": false,
-        "idCliente": "ce128173",
-        "idFuncion": "b9a5d1c4",
-        "numAsiento": 3,
-        "id": "38b55abc",
+        "idCliente": "96e460cc",
+        "idFuncion": "eb5a67b7",
+        "numAsiento": 2,
+        "id": "12df4efb",
         "estadoReserva": true,
-        "fechaReserva": "2025-11-16"
+        "precioTotal": 9375,
+        "fechaReserva": "2025-11-18"
     },
     {
-        "pagado": false,
+        "pagado": true,
         "idCliente": "ce128173",
-        "idFuncion": "b9a5d1c4",
-        "numAsiento": 25,
-        "id": "b4190860",
+        "idFuncion": "fd189beb",
+        "numAsiento": 27,
+        "id": "d359521c",
         "estadoReserva": true,
-        "fechaReserva": "2025-11-16"
+        "precioTotal": 9375,
+        "fechaReserva": "2025-11-18"
     }
 ]

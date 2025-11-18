@@ -1,14 +1,13 @@
-package UI; // O donde pongas tu clase Menu
-
-// Importa todos los modelos, gestores y enums
+package UI;
 import Contenedoras.GestorDeCatalogo;
 import Contenedoras.GestorDeVentas;
 import Contenedoras.GestorUsuario;
 import Models.*;
-import Enum.*; // Asumiendo que tus Enums (Genero, Clasificacion) están aquí
-import Excepciones.*; // Para los catch
-
+import Enum.*;
+import Excepciones.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -44,8 +43,8 @@ public class Menu {
 
         while (opcion != 4) {
             System.out.println("\n--- BIENVENIDO AL CINE ---");
-            System.out.println("1. Iniciar Sesión (Cliente)");
-            System.out.println("2. Registrarse (Cliente)");
+            System.out.println("1. Iniciar Sesión");
+            System.out.println("2. Registrarse");
             System.out.println("3. Iniciar como Administrador");
             System.out.println("4. Salir");
             System.out.print("Seleccione una opción: ");
@@ -96,17 +95,22 @@ public class Menu {
      */
     private void mostrarMenuAdmin() {
         int opcion = 0;
-        while (opcion != 9) {
+        while (opcion != 10) {
             System.out.println("\n--- 🧑‍💼 MENÚ DE ADMINISTRADOR ---");
-            System.out.println("1. Crear Película");
-            System.out.println("2. Crear Sala");
-            System.out.println("3. Crear Función");
+            System.out.println("--- Inventario ---");
+            System.out.println("1. Agregar Película");
+            System.out.println("2. Agregar Sala");
+            System.out.println("3. Agregar Función");
+            System.out.println("\n--- Consultas ---");
             System.out.println("4. Listar Películas");
             System.out.println("5. Listar Salas");
             System.out.println("6. Listar Funciones");
-            System.out.println("9. Cerrar Sesión");
+            System.out.println("\n--- Mantenimiento ---");
+            System.out.println("7. Eliminar Película");
+            System.out.println("8. Eliminar Sala");
+            System.out.println("9. Eliminar Función");
+            System.out.println("\n10. Cerrar Sesión");
             System.out.print("Seleccione una opción: ");
-
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
             } catch (NumberFormatException e) {
@@ -133,7 +137,20 @@ public class Menu {
                 case 6:
                     uiListarFunciones();
                     break;
+                case 7:
+                    uiEliminarPelicula();
+                    break;
+
+                case 8:
+                    uiEliminarSala();
+                    break;
+
+
                 case 9:
+                    uiEliminarFuncion();
+                    break;
+
+                case 10:
                     System.out.println("Cerrando sesión de administrador...");
                     break;
                 default:
@@ -141,6 +158,93 @@ public class Menu {
             }
         }
     }
+
+
+    private void uiEliminarPelicula() {
+        System.out.println("\n--- Eliminar Película ---");
+        uiListarPeliculas(); // Mostramos la lista para que el admin vea los IDs
+
+        try {
+            System.out.print("Ingrese el ID de la Película que desea ELIMINAR: ");
+            String id = scanner.nextLine();
+
+            // Llama al Gestor (que lanza excepciones si falla)
+            gestorDeCatalogo.eliminarPelicula(id);
+
+            System.out.println("¡Película eliminada con éxito!");
+
+        } catch (Exception e) { // Atrapa ElementoNoExiste, etc.
+            System.err.println("Error al eliminar la película: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Pide un ID de Sala y llama al gestor para eliminarla.
+     */
+    private void uiEliminarSala() {
+        System.out.println("\n--- Eliminar Sala ---");
+        uiListarSalas(); // Mostramos la lista para que el admin vea los IDs
+
+        try {
+            System.out.print("Ingrese el ID de la Sala que desea ELIMINAR: ");
+            String id = scanner.nextLine();
+
+            gestorDeCatalogo.eliminarSala(id);
+            System.out.println("¡Sala eliminada con éxito!");
+
+        } catch (Exception e) {
+            System.err.println("Error al eliminar la sala: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Pide un ID de Función y llama al gestor para eliminarla.
+     */
+    private void uiEliminarFuncion() {
+        System.out.println("\n--- Eliminar Función ---");
+
+        // 1. Mostramos la lista de funciones para que el Admin vea los IDs
+        uiListarFunciones();
+
+        System.out.print("Ingrese el ID de la Función que desea ELIMINAR: ");
+        String idFuncion = scanner.nextLine();
+
+        // Salida rápida si no ingresa nada
+        if (idFuncion == null || idFuncion.trim().isEmpty()) {
+            System.out.println("Operación cancelada.");
+            return;
+        }
+
+        try {
+            // --- VALIDACIÓN DE BLOQUEO ---
+
+            // 2. Le preguntamos al Gestor de Ventas si la función está en uso.
+            //    (El Menú es el único que conoce a ambos gestores).
+            boolean tieneReservas = gestorDeVentas.funcionTieneReservas(idFuncion);
+
+            if (tieneReservas) {
+                // 3. Si está en uso (true), BLOQUEAMOS la eliminación.
+                //    Esto es un mensaje de error para el usuario, está bien usar .err.
+                System.err.println("\nError: No se puede eliminar la función (ID: " + idFuncion + ").");
+                System.err.println("Motivo: Ya tiene reservas activas vendidas.");
+
+            } else {
+                // 4. Si está libre (false), SÍ procedemos a borrar.
+                //    Llamamos al Gestor de Catálogo (el que sabe borrar funciones).
+                gestorDeCatalogo.eliminarFuncion(idFuncion);
+                System.out.println("¡Función eliminada con éxito!.");
+            }
+
+        } catch (ElementoNoExiste e) {
+            // Esta excepción salta si el ID que escribió el admin no existe
+            System.err.println("Error al eliminar: " + e.getMessage());
+        } catch (Exception e) {
+            // Atrapa cualquier otro error inesperado
+            System.err.println("Error inesperado al procesar la eliminación: " + e.getMessage());
+            e.printStackTrace(); // Para depuración
+        }
+    }
+
 
     /**
      * Bucle del Menú de Cliente.
@@ -150,9 +254,10 @@ public class Menu {
         int opcion = 0;
         while (opcion != 9) {
             System.out.println("\n--- 🎟️ MENÚ DE CLIENTE ---");
-            System.out.println("1. Comprar Entrada (Crear Reserva)");
+            System.out.println("1. Comprar Entrada");
             System.out.println("2. Ver Mis Reservas");
-            System.out.println("3. Listar Películas Disponibles");
+            System.out.println("3. Ver Cartelera");
+            System.out.println("4. Pagar Reserva");
             System.out.println("9. Cerrar Sesión");
             System.out.print("Seleccione una opción: ");
 
@@ -171,7 +276,12 @@ public class Menu {
                     uiVerMisReservas();
                     break;
                 case 3:
-                    uiListarPeliculas();
+                    uiListarPeliculasCliente();
+                    break;
+                case 4:
+
+                    uiPagarReserva();
+
                     break;
                 case 9:
                     System.out.println("Cerrando sesión de cliente...");
@@ -181,6 +291,7 @@ public class Menu {
             }
         }
     }
+
 
     // --- UIs de LOGIN y REGISTRO ---
 
@@ -201,6 +312,7 @@ public class Menu {
             this.usuarioLogueado = null;
         }
     }
+
 
     private void uiLoginAdmin() {
         System.out.println("\n--- Login Administrador ---");
@@ -244,8 +356,21 @@ public class Menu {
             System.out.println("¡Registro exitoso! Ahora puedes iniciar sesión.");
 
         } catch (Exception e) {
-            // El Menú atrapa CUALQUIER error de validación
+            // El Menú atrapa cualquier error de validación
             System.err.println("Error de registro: " + e.getMessage());
+        }
+    }
+
+    private void uiListarPeliculasCliente() {
+        System.out.println("\n--- Películas en Cartelera ---");
+        ArrayList<Pelicula> lista = gestorDeCatalogo.getListaPeliculas();
+        if (lista.isEmpty()) {
+            System.out.println("No hay películas cargadas en este momento.");
+            return;
+        }
+        for (Pelicula p : lista) {
+            // Llama al nuevo método 'getDetalleCliente()' de Pelicula.java
+            System.out.println("• " + p.getDetalleParaCartelera());
         }
     }
 
@@ -258,8 +383,8 @@ public class Menu {
             System.out.print("Título: ");
             String titulo = scanner.nextLine();
 
-            System.out.print("Genero (ACCION, COMEDIA, DRAMA, CIENCIA_FICCION): "); // Ajusta tus enums
-            Genero genero = Genero.valueOf(scanner.nextLine().toUpperCase());
+
+            Genero genero = uiSeleccionarGenero();
 
             System.out.print("Duración (minutos): ");
             int duracion = Integer.parseInt(scanner.nextLine());
@@ -309,12 +434,26 @@ public class Menu {
             System.out.print("Ingrese el ID de la Sala: ");
             String idSala = scanner.nextLine();
 
-            // 3. Pedir Fecha y Hora
-            System.out.print("Ingrese Fecha y Hora (Formato AAAA-MM-DDTHH:MM, ej: 2025-11-20T19:30): ");
-            String fechaHoraStr = scanner.nextLine();
-            LocalDateTime fechaHora = LocalDateTime.parse(fechaHoraStr); // Lanza DateTimeParseException
+            System.out.println("\n--- Programar Horario ---");
 
-            gestorDeCatalogo.crearFuncion(idPelicula, idSala, fechaHora);
+            // Pedimos la FECHA
+            System.out.print("Ingrese Fecha (Formato DD/MM/AAAA): ");
+            String fechaStr = scanner.nextLine();
+            // Creamos un formateador para "Día/Mes/Año"
+            DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate fecha = LocalDate.parse(fechaStr, formatoFecha);
+
+            // Pedimos la HORA
+            System.out.print("Ingrese Hora (Formato HH:MM, 24hs): ");
+            String horaStr = scanner.nextLine();
+            // Creamos un formateador para "Hora:Minuto"
+            DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
+            LocalTime hora = LocalTime.parse(horaStr, formatoHora);
+
+            // Combinamos la fecha y la hora en un solo objeto
+            LocalDateTime fechaHoraCompleta = LocalDateTime.of(fecha, hora);
+
+            gestorDeCatalogo.crearFuncion(idPelicula, idSala, fechaHoraCompleta);
             System.out.println("¡Función creada con éxito!");
 
         } catch (DateTimeParseException e) {
@@ -331,8 +470,8 @@ public class Menu {
     private void uiCrearReserva() {
         System.out.println("\n--- Comprar Entrada ---");
 
-        // 1. OBTENEMOS LA LISTA DE FUNCIONES (el "cerebro" no cambia)
-        ArrayList<Funcion> funcionesDisponibles = gestorDeCatalogo.getListaFunciones();
+        // 1. OBTENEMOS LA LISTA DE FUNCIONES
+        ArrayList<Funcion> funcionesDisponibles = gestorDeCatalogo.getFuncionesDisponiblesParaVenta();
 
         if (funcionesDisponibles.isEmpty()) {
             System.out.println("No hay funciones programadas.");
@@ -340,7 +479,7 @@ public class Menu {
             return;
         }
 
-        // 2. MOSTRAMOS LA LISTA CON NÚMEROS (la "mejora" de la UI)
+        // 2. MOSTRAMOS LA LISTA CON NÚMEROS
         System.out.println("--- Listado de Funciones ---");
 
         // Usamos un bucle 'for i' para poder tener un índice numérico
@@ -354,13 +493,13 @@ public class Menu {
                 detalle = "Error al cargar detalle de función " + f.getId();
             }
 
-            // ¡La Magia! Imprimimos (i + 1)
+            //  (i + 1) porque el array empieza desde 0 y no queremos eso para el usuario
             System.out.printf("[%d] %s\n", (i + 1), detalle);
             System.out.println("-----");
         }
 
         try {
-            // 3. PEDIMOS EL NÚMERO (ej: 1, 2, 3...)
+            // 3. se pide  el numero (ej: 1, 2, 3...)
             System.out.print("Seleccione el número [#] de la Función que desea: ");
             int seleccion = Integer.parseInt(scanner.nextLine());
 
@@ -371,21 +510,79 @@ public class Menu {
             }
 
             // 4. TRADUCIMOS EL NÚMERO AL OBJETO REAL
-            // (seleccion - 1 porque los Arrays empiezan en 0)
             Funcion funcionElegida = funcionesDisponibles.get(seleccion - 1);
-            String idFuncion = funcionElegida.getId(); // <-- Obtenemos el "b9a5d1c4"
+            String idFuncion = funcionElegida.getId(); // <-- Obtenemos el "b9a5d1c4" por ejemplo
 
-            // --- El resto del proceso es el mismo que tenías ---
 
-            // 5. Mostrar Asientos
-            System.out.println("Asientos Ocupados: " + funcionElegida.getAsientosOcupados().toString());
-            System.out.println("Asientos Disponibles: " + funcionElegida.getAsientosDisponibles());
+            System.out.println("--- Las butacas ocupadas se veran con la cruz ---");
+            Sala sala = gestorDeCatalogo.buscarSala(funcionElegida.getIdSala());
 
+// Hacemos un bucle de 1 hasta la capacidad total
+            for (int i = 1; i <= sala.getCapacidadTotal(); i++) {
+
+                // Chequeamos si el asiento 'i' está en la lista de ocupados
+                if (funcionElegida.isAsientoOcupado(i)) {
+                    System.out.print("[ X ] "); // Ocupado
+                } else {
+                    System.out.printf("[%2d] ", i); // Disponible (con formato)
+                }
+
+                // Para que se vea como un cine (ej. 10 asientos por fila)
+                if (i % 10 == 0) {
+                    System.out.println("\n"); // Salto de línea
+                }
+            }
+            System.out.println("\n------------------------");
             System.out.print("Ingrese el Número de Asiento (ej: 5): ");
             int numAsiento = Integer.parseInt(scanner.nextLine());
 
+
+            // 6. El Menú ahora debe buscar la película para saber el precio
+            Pelicula pelicula = gestorDeCatalogo.buscarPelicula(funcionElegida.getIdPelicula());
+            double precioACobrar = pelicula.getPrecioBase();
+            // (Aquí podrías agregar lógica extra, ej: if (sala.is3D()) precioACobrar *= 1.25;)
+
+            System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
+
+            if (sala.isEs3D()) {
+                double recargo = precioACobrar * 0.25; // 25% de recargo
+                precioACobrar += recargo;
+                System.out.printf("Info: Se aplicó un recargo de $%.2f por ser Sala 3D.\n", recargo);
+            }
+            // --- FIN DE LA LÓGICA DE PRECIO ---
+
+            System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
+
+
+            String confirmacion = "";
+            boolean entradaValida = false;
+
+            // Bucle 'while' que se repite hasta que la entrada sea 'S' o 'N'
+            while (!entradaValida) {
+                System.out.print("¿Confirmar Reserva? (S/N): ");
+                confirmacion = scanner.nextLine();
+
+                // .toUpperCase() convierte "s" en "S" y "n" en "N"
+                // .equals() comprueba si es S o N
+                if (confirmacion.toUpperCase().equals("S") || confirmacion.toUpperCase().equals("N")) {
+                    entradaValida = true; // La entrada es válida, salimos del bucle
+                } else {
+                    // Si no es S o N, mostramos error y el bucle se repite
+                    System.err.println("Error: Por favor, ingrese solo 'S' o 'N'.");
+                }
+            }
+            // --- FIN DE LA VALIDACIÓN ---
+
+
+            // 7. VERIFICAR CONFIRMACIÓN
+            // Usamos .equalsIgnoreCase() para ser flexibles (acepta 's' o 'S')
+            if (!confirmacion.equalsIgnoreCase("S")) {
+                System.out.println("Compra cancelada.");
+                return;
+            }
+
             // 6. Llama al Gestor de Ventas (usando el ID que encontramos)
-            gestorDeVentas.crearReserva(this.usuarioLogueado.getId(), idFuncion, numAsiento);
+            gestorDeVentas.crearReserva(this.usuarioLogueado.getId(), idFuncion, numAsiento, precioACobrar);
             System.out.println("¡Reserva creada con éxito! (Pendiente de pago)");
 
         } catch (NumberFormatException e) {
@@ -408,7 +605,7 @@ public class Menu {
         // Por cada reserva, pedimos el ticket detallado
         for (Reserva r : misReservas) {
             try {
-                String ticket = gestorDeVentas.getTicketDetallado(r.getId());
+                String ticket = gestorDeVentas.getTicketDetalladoCliente(r.getId(), this.usuarioLogueado.getNombre());
                 System.out.println(ticket);
                 System.out.println("--------------------");
             } catch (Exception e) {
@@ -467,4 +664,86 @@ public class Menu {
             }
         }
     }
+
+    private void uiPagarReserva() {
+        System.out.println("\n--- Pagar Reserva Pendiente ---");
+
+        // 1. Usamos el nuevo método del gestor
+        ArrayList<Reserva> pendientes = gestorDeVentas.buscarReservasPendientesPorCliente(this.usuarioLogueado.getId());
+
+        if (pendientes.isEmpty()) {
+            System.out.println("No tienes reservas pendientes de pago.");
+            return;
+        }
+
+        // 2. Mostramos la lista de pendientes con un índice
+        System.out.println("Tus reservas pendientes de pago:");
+        for (int i = 0; i < pendientes.size(); i++) {
+            Reserva r = pendientes.get(i);
+            String detalle = "";
+            try {
+                // Obtenemos el detalle (Peli, Sala, Hora)
+                detalle = gestorDeCatalogo.getDetalleFuncion(r.getIdFuncion());
+            } catch (Exception e) {
+                detalle = "Error al cargar detalle de función.";
+            }
+
+            System.out.printf("[%d] Asiento %d | %s | Precio: $%.2f\n",
+                    (i + 1),
+                    r.getNumAsiento(),
+                    detalle,
+                    r.getPrecioTotal() // <-- Mostramos el precio
+            );
+            System.out.println("-----");
+        }
+
+        try {
+            // 3. Pedimos al usuario que elija
+            System.out.print("Seleccione el número [#] de la reserva que desea pagar: ");
+            int seleccion = Integer.parseInt(scanner.nextLine());
+
+            if (seleccion < 1 || seleccion > pendientes.size()) {
+                System.err.println("Error: Selección no válida.");
+                return;
+            }
+
+            // 4. Traducimos la selección al ID de la reserva
+            Reserva reservaAPagar = pendientes.get(seleccion - 1);
+            String idReserva = reservaAPagar.getId();
+
+            // 5. Llamamos al Gestor para pagar
+            double totalPagado = gestorDeVentas.pagarReserva(idReserva);
+
+            // 6. Mostramos el resultado (¡tu requisito!)
+            System.out.println("\n¡Pago procesado con éxito!");
+            System.out.printf("Total pagado: $%.2f\n", totalPagado);
+
+        } catch (NumberFormatException e) {
+            System.err.println("Error: Debe ingresar un número.");
+        } catch (Exception e) {
+            System.err.println("Error al procesar el pago: " + e.getMessage());
+        }
+    }
+
+    private Genero uiSeleccionarGenero() {
+        System.out.println("Seleccione un Género:");
+        int i = 1;
+        // Itera sobre TODOS los valores del Enum Genero
+        for (Genero g : Genero.values()) {
+            System.out.printf("[%d] %s\n", i, g.name());
+            i++;
+        }
+
+        while (true) { // Bucle hasta que elija bien
+            try {
+                System.out.print("Seleccione el número [#]: ");
+                int seleccion = Integer.parseInt(scanner.nextLine());
+                return Genero.values()[seleccion - 1]; // Devuelve el Enum
+            } catch (Exception e) {
+                System.err.println("Error: Selección no válida.");
+            }
+        }
+    }
+
+
 }

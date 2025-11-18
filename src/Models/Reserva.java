@@ -24,12 +24,12 @@ public class Reserva implements ItoJson, IIdentificable {
     private LocalDate fechaReserva; // El día que se HIZO la reserva
     private boolean pagado;
     private boolean estadoReserva; // Ej: Activa o Cancelada
-
+    private Double precioTotal;
     /**
      * Constructor para el GestorDeVentas.
      * Auto-genera su propio ID.
      */
-    public Reserva(String idCliente, String idFuncion, int numAsiento, LocalDate fechaReserva, boolean pagado, boolean estadoReserva) {
+    public Reserva(String idCliente, String idFuncion, int numAsiento, LocalDate fechaReserva, boolean pagado, boolean estadoReserva, Double precioTotal) {
         this.id = UUID.randomUUID().toString().substring(0, 8); // Auto-ID
         this.idCliente = idCliente;
         this.idFuncion = idFuncion;
@@ -37,6 +37,7 @@ public class Reserva implements ItoJson, IIdentificable {
         this.fechaReserva = fechaReserva;
         this.pagado = pagado;
         this.estadoReserva = estadoReserva;
+        this.precioTotal = precioTotal;
     }
 
     /**
@@ -54,6 +55,10 @@ public class Reserva implements ItoJson, IIdentificable {
     public boolean isPagado() { return pagado; }
     public boolean isEstadoReserva() { return estadoReserva; }
 
+    public double getPrecioTotal() {
+        return precioTotal;
+    }
+
     // --- Setters (Usados por traerDesdeJson) ---
     public void setId(String id) { this.id = id; }
     public void setIdCliente(String idCliente) { this.idCliente = idCliente; }
@@ -63,14 +68,10 @@ public class Reserva implements ItoJson, IIdentificable {
     public void setPagado(boolean pagado) { this.pagado = pagado; }
     public void setEstadoReserva(boolean estadoReserva) { this.estadoReserva = estadoReserva; }
 
-
-    public boolean marcarComoPagado() {
-        if (!this.pagado) {
-            this.pagado = true;
-            return true;
-        }
-        return false;
+    public void setPrecioTotal(double precioTotal) {
+        this.precioTotal = precioTotal;
     }
+
 
     // 6. Equals/HashCode (necesarios para GestionDeRepositorio)
     @Override
@@ -121,6 +122,7 @@ public class Reserva implements ItoJson, IIdentificable {
             j.put("pagado", this.pagado); // <-- Unificado a minúscula
             j.put("fechaReserva", this.fechaReserva.toString());
             j.put("numAsiento", this.numAsiento);
+            j.put("precioTotal", this.precioTotal);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -139,6 +141,7 @@ public class Reserva implements ItoJson, IIdentificable {
         r.setPagado(o.getBoolean("pagado")); // <-- Unificado a minúscula
         r.setNumAsiento(o.getInt("numAsiento"));
         r.setFechaReserva(LocalDate.parse(o.getString("fechaReserva")));
+        r.setPrecioTotal(o.getDouble("precioTotal"));
 
         return r;
     }

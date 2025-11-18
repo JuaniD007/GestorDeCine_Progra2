@@ -9,40 +9,38 @@ import org.json.JSONArray;
 import java.util.ArrayList;
 
 public class RepositorioPelicula {
-    private GestionDeRepositorio<Pelicula> peliculaGestionDeElementos;
-    private JSONArray j;
+    private GestionDeRepositorio<Pelicula> peliculaGestionDeRepositorio;
     public RepositorioPelicula() {
-        this.peliculaGestionDeElementos = new GestionDeRepositorio<>();
-        this.j = new JSONArray();
+        this.peliculaGestionDeRepositorio = new GestionDeRepositorio<>();
+
     }
 
     public boolean agregarPelicula ( Pelicula p ) throws VerificarNulo, ElementoRepetido {
-        return this.peliculaGestionDeElementos.agregarElemento(p);
+        return this.peliculaGestionDeRepositorio.agregarElemento(p);
     }
 
     public boolean EliminarPelicula ( String id) throws  VerificarNulo, ElementoRepetido, ElementoNoExiste {
-        return peliculaGestionDeElementos.eliminarElemento(id);
+        return peliculaGestionDeRepositorio.eliminarElemento(id);
     }
+
     public Pelicula buscarElemento(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido{
-        return peliculaGestionDeElementos.buscarElemento(id);
+        return peliculaGestionDeRepositorio.buscarElemento(id);
     }
 
     public ArrayList<Pelicula> getListaPeliculas() {
-        return this.peliculaGestionDeElementos.getElementos();
+        return this.peliculaGestionDeRepositorio.getElementos();
 
 
 
     }
-
-    public JSONArray ArregloDePeliculas() {
+    public JSONArray arregloDePeliculasJson() {
         JSONArray jsonArray = new JSONArray();
 
-        for (Pelicula pelicula : this.peliculaGestionDeElementos.getElementos()) { // Recorre una por una todas las películas que están guardadas dentro de tu GestionDeRepositorio.
+        for (Pelicula pelicula : this.peliculaGestionDeRepositorio.getElementos()) { // Recorre una por una todas las películas que están guardadas dentro de tu GestionDeRepositorio.
             jsonArray.put(pelicula.toJson());
         }
 
         return jsonArray; // devuelve arreglo JSON
     }
-
 
 }

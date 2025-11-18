@@ -1,15 +1,18 @@
 package Contenedoras;
+
 import Models.*;
 import Excepciones.*;
 import Enum.Genero;
 import ModelsJson.JsonUtiles;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
+
+
 public class GestorDeCatalogo {
 
     // --- 1. ATRIBUTOS (Maneja 3 repositorios) ---
@@ -68,7 +71,7 @@ public class GestorDeCatalogo {
             throw new ValidacionException("Ya existe una película con el título: " + titulo);
         }
 
-        Pelicula nueva = new Pelicula(duracion, genero,  precioBase ,titulo);
+        Pelicula nueva = new Pelicula(duracion, genero, precioBase, titulo);
         repoPeliculas.agregarPelicula(nueva);
         guardarPeliculas(); // Persiste el cambio en el JSON
     }
@@ -111,7 +114,7 @@ public class GestorDeCatalogo {
             throw new ValidacionException("Ya existe una sala con el número " + numSala);
         }
 
-        Sala nueva = new Sala(numSala,  capacidad, es3D);
+        Sala nueva = new Sala(numSala, capacidad, es3D);
         repoSalas.agregarSala(nueva);
         guardarSalas(); // Persiste el cambio en el JSON
     }
@@ -147,26 +150,55 @@ public class GestorDeCatalogo {
     public void crearFuncion(String idPelicula, String idSala, LocalDateTime fechaHora)
             throws ValidacionException, ElementoRepetido, VerificarNulo, ElementoNoExiste {
 
-        // 1. Valida que los IDs existan
-        Pelicula p = repoPeliculas.buscarElemento(idPelicula);
-        Sala s = repoSalas.buscarSala(idSala);
-
-        // 2. Valida la lógica de negocio (superposición de horarios)
-        ArrayList<Funcion> funcionesDeLaSala = buscarFuncionesPorSala(idSala);
-        for (Funcion f : funcionesDeLaSala) {
-
-            // Lógica simple de superposición (misma hora de inicio)
-            // (Se puede mejorar sumando la duración de la película)
-            if (f.getHorario().isEqual(fechaHora)) {
-                throw new ValidacionException("Horario superpuesto en la sala " + s.getNumSala());
-            }
+        // --- 1. BUSCAR OBJETOS PRINCIPALES ---
+        // (Esto es lo que ya teníamos)
+        Pelicula peliculaNueva;
+        Sala sala;
+        try {
+            peliculaNueva = repoPeliculas.buscarElemento(idPelicula);
+            sala = repoSalas.buscarSala(idSala);
+        } catch (ElementoNoExiste e) {
+            throw new ValidacionException("La película o la sala seleccionada no existen.");
         }
 
-        // 3. Si todo OK, crea la función
-        // La función hereda la capacidad total de la sala al crearse
-        Funcion nueva = new Funcion(idPelicula, idSala, fechaHora, s.getCapacidadTotal());
-        repoFunciones.agregarFuncion(nueva);
-        guardarFunciones(); // Persiste el cambio
+        // --- 2. DEFINIR RANGO DE LA NUEVA FUNCIÓN ---
+        // (Aquí usamos la duración de la película)
+        LocalDateTime inicioNueva = fechaHora;
+        long duracionNueva = peliculaNueva.getDuracion(); // Ej: 120 minutos
+        LocalDateTime finNueva = inicioNueva.plusMinutes(duracionNueva);
+
+        // --- 3. VALIDACIÓN DE LÓGICA (¡AQUÍ ESTÁ LA MAGIA!) ---
+
+        // Obtenemos todas las funciones que YA existen en esa sala
+        ArrayList<Funcion> funcionesDeLaSala = buscarFuncionesPorSala(idSala);
+
+        for (Funcion fExistente : funcionesDeLaSala) {
+
+            // Por cada función, necesitamos saber cuándo empieza y termina
+            Pelicula pExistente = repoPeliculas.buscarElemento(fExistente.getIdPelicula());
+            long duracionExistente = pExistente.getDuracion();
+            /// Long es una palabra reservada que se u sa para almacenar numeros enteros que son extremadamente grandes
+            LocalDateTime inicioExistente = fExistente.getHorario();
+            LocalDateTime finExistente = inicioExistente.plusMinutes(duracionExistente);
+
+            // --- Lógica de Superposición (Colisión) ---
+            // Un horario (A-B) se pisa con otro (C-D) si:
+            // (El inicio de A es antes del fin de D) Y (El fin de A es después del inicio de C)
+            // (A < D) && (B > C)
+
+            if (inicioExistente.isBefore(finNueva) && finExistente.isAfter(inicioNueva)) {
+
+                throw new ValidacionException(
+                        "Error: El horario se pisa con la función de '" + pExistente.getTitulo() + "' " +
+                                "(que termina a las " + finExistente.toLocalTime() + ").");
+            }
+        }
+        // --- FIN DE LA VALIDACIÓN ---
+
+        // 4. Si el bucle 'for' termina sin lanzar excepción, el horario está libre.
+        Funcion nuevaFuncion = new Funcion(idPelicula, idSala, fechaHora, sala.getCapacidadTotal());
+        repoFunciones.agregarFuncion(nuevaFuncion);
+        guardarFunciones();
     }
 
     public Funcion buscarFuncion(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
@@ -197,11 +229,13 @@ public class GestorDeCatalogo {
 
     // --- Métodos de Guardado ---
     public void guardarPeliculas() {
-        JsonUtiles.grabarUnJson(repoPeliculas.ArregloDePeliculas(), ARCHIVO_PELICULAS);
+        JsonUtiles.grabarUnJson(repoPeliculas.arregloDePeliculasJson(), ARCHIVO_PELICULAS);
     }
+
     public void guardarSalas() {
-        JsonUtiles.grabarUnJson(repoSalas.ArregloDeSalas(), ARCHIVO_SALAS);
+        JsonUtiles.grabarUnJson(repoSalas.arregloDeSalasJson(), ARCHIVO_SALAS);
     }
+
     public void guardarFunciones() {
         JsonUtiles.grabarUnJson(repoFunciones.ArregloDeFunciones(), ARCHIVO_FUNCIONES);
     }
@@ -217,7 +251,9 @@ public class GestorDeCatalogo {
                     Pelicula p = Pelicula.traerDesdeJson(obj);
                     repoPeliculas.agregarPelicula(p);
                 }
-            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_PELICULAS + " corrupto o error al cargar."); }
+            } catch (Exception e) {
+                System.err.println("ALERTA: " + ARCHIVO_PELICULAS + " corrupto o error al cargar.");
+            }
         }
     }
 
@@ -231,7 +267,9 @@ public class GestorDeCatalogo {
                     Sala s = Sala.traerDesdeJson(obj);
                     repoSalas.agregarSala(s);
                 }
-            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_SALAS + " corrupto o error al cargar."); }
+            } catch (Exception e) {
+                System.err.println("ALERTA: " + ARCHIVO_SALAS + " corrupto o error al cargar.");
+            }
         }
     }
 
@@ -245,7 +283,9 @@ public class GestorDeCatalogo {
                     Funcion f = Funcion.traerDesdeJson(obj);
                     repoFunciones.agregarFuncion(f);
                 }
-            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_FUNCIONES + " corrupto o error al cargar."); }
+            } catch (Exception e) {
+                System.err.println("ALERTA: " + ARCHIVO_FUNCIONES + " corrupto o error al cargar.");
+            }
         }
     }
 
@@ -253,6 +293,7 @@ public class GestorDeCatalogo {
      * Recibe el ID de una función y devuelve un String "bonito"
      * con los detalles (título, sala, hora) conectando los repositorios.
      * * @param idFuncion El ID de la función a detallar.
+     *
      * @return Un String formateado con los detalles.
      * @throws ElementoNoExiste Si la función, película o sala no se encuentran.
      */
@@ -280,5 +321,18 @@ public class GestorDeCatalogo {
         return detalle;
     }
 
+
+    public ArrayList<Funcion> getFuncionesDisponiblesParaVenta() {
+        ArrayList<Funcion> filtradas = new ArrayList<>();
+        LocalDateTime ahora = LocalDateTime.now();
+
+        for (Funcion f : repoFunciones.getListaFunciones()) {
+            // Si la hora de la función es DESPUÉS de la hora actual...
+            if (f.getHorario().isAfter(ahora)) {
+                filtradas.add(f);
+            }
+        }
+        return filtradas;
+    }
 
 }

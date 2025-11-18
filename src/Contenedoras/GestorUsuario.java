@@ -19,16 +19,13 @@ public class GestorUsuario {
 
     // --- 1. CONSTRUCTOR PRINCIPAL (EL MOTOR DE ARRANQUE) ---
     public GestorUsuario() {
-        // Intenta leer el archivo usando tu método
+        // Intenta leer el archivo usando el método
         JSONTokener tokener = JsonUtiles.leerUnJson(ARCHIVO_USUARIOS);
 
         // 2. Comprueba si el archivo NO existía (tu método devuelve null)
         if (tokener == null) {
-            System.out.println("No se encontró " + ARCHIVO_USUARIOS + ". Creando admin por defecto...");
             crearAdminPorDefecto(); // Crea el admin y guarda el archivo
         } else {
-            // 3. Si SÍ existía, lo carga en memoria
-            System.out.println("Cargando usuarios desde " + ARCHIVO_USUARIOS + "...");
             try {
                 JSONArray usuariosJson = new JSONArray(tokener); // Convierte el Tokener a JSONArray
                 cargarUsuariosDesdeJson(usuariosJson);
@@ -60,7 +57,7 @@ public class GestorUsuario {
                 }
 
                 if (usuario != null) {
-                    // Rellena el objeto usando tu método estático (Paso Previo 1)
+                    // Rellena el objeto usando el método estático (Paso Previo 1)
                     usuario = Usuario.traerDesdeJson(usuario, obj);
                     repoUsuario.agregarUsuario(usuario); // Agrega a memoria
                 }
@@ -76,7 +73,7 @@ public class GestorUsuario {
      */
     private void crearAdminPorDefecto() {
         Administrador admin = new Administrador(
-                "Admin General", "11111111", 18, "admin@cine.com", "admin");
+                "Admin General", "1111", 18, "admin@cine.com", "admin");
 
         try {
             // 1. Agrega el admin al repositorio en memoria
@@ -92,17 +89,17 @@ public class GestorUsuario {
 
     /**
      * Método PÚBLICO para guardar el estado actual del repositorio en el JSON.
-     * Usa tu JsonUtiles.grabarUnJson
+     * Usa  JsonUtiles.grabarUnJson
      */
     public void guardarDatos() {
         JSONArray jsonArray = new JSONArray();
 
-        // 2. Usa el método getUsuarios() que agregaste en el Repositorio (Paso Previo 3)
+        // 2. Usa el método getUsuarios() que se agrego en el Repositorio (Paso Previo 3)
         for (Usuario usuario : repoUsuario.getUsuarios().values()) {
             jsonArray.put(usuario.toJson());
         }
 
-        // 3. Llama a tu método exacto de JsonUtiles
+        // 3. Llama al método exacto de JsonUtiles
         JsonUtiles.grabarUnJson(jsonArray, ARCHIVO_USUARIOS);
     }
 
@@ -196,9 +193,4 @@ public class GestorUsuario {
         }
     }
 
-    // (Necesario para que el Menu obtenga el objeto)
-
-    public Usuario buscarUsuarioPorDni(String dni) {
-        return repoUsuario.buscarUsuarioPorDni(dni.trim());
-    }
 }

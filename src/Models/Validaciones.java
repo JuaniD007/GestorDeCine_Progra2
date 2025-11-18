@@ -2,7 +2,7 @@ package Models;
 
 import java.util.regex.Pattern;
 
-public class Validaciones {
+public abstract class Validaciones {
 
     public static boolean isStringValido(String texto) {
 
@@ -50,8 +50,6 @@ public class Validaciones {
         return valor >= min && valor <= max;
     }
 
-
-        ///  validar que el horario de la pelicula en la misma sala no coincidan. y no te deje agregar el mismo horario
 
 
 
