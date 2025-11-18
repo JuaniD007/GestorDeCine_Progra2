@@ -21,17 +21,17 @@
         "idPelicula": "6c6669df"
     },
     {
-        "precioBase": 2999,
-        "genero": "COMEDIA",
-        "titulo": "Mi villano Favorito 2",
-        "duracion": 120,
-        "idPelicula": "6b349794"
-    },
-    {
         "precioBase": 3000,
         "genero": "ACCION",
         "titulo": "ad",
         "duracion": 120,
         "idPelicula": "166dd5b9"
+    },
+    {
+        "precioBase": 1200,
+        "genero": "COMEDIA",
+        "titulo": "Los Simpsons",
+        "duracion": 100,
+        "idPelicula": "1af4eece"
     }
 ]

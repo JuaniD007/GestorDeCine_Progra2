@@ -1,14 +1,13 @@
-package UI; // O donde pongas tu clase Menu
-
-// Importa todos los modelos, gestores y enums
+package UI;
 import Contenedoras.GestorDeCatalogo;
 import Contenedoras.GestorDeVentas;
 import Contenedoras.GestorUsuario;
 import Models.*;
-import Enum.*; // Asumiendo que tus Enums (Genero, Clasificacion) están aquí
-import Excepciones.*; // Para los catch
-
+import Enum.*;
+import Excepciones.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -161,10 +160,6 @@ public class Menu {
     }
 
 
-
-
-
-
     private void uiEliminarPelicula() {
         System.out.println("\n--- Eliminar Película ---");
         uiListarPeliculas(); // Mostramos la lista para que el admin vea los IDs
@@ -221,7 +216,7 @@ public class Menu {
         }
 
         try {
-            // --- ¡VALIDACIÓN DE BLOQUEO! ---
+            // --- VALIDACIÓN DE BLOQUEO ---
 
             // 2. Le preguntamos al Gestor de Ventas si la función está en uso.
             //    (El Menú es el único que conoce a ambos gestores).
@@ -281,9 +276,9 @@ public class Menu {
                     uiVerMisReservas();
                     break;
                 case 3:
-                  uiListarPeliculasCliente();
+                    uiListarPeliculasCliente();
                     break;
-                case 4 :
+                case 4:
 
                     uiPagarReserva();
 
@@ -296,7 +291,6 @@ public class Menu {
             }
         }
     }
-
 
 
     // --- UIs de LOGIN y REGISTRO ---
@@ -318,10 +312,6 @@ public class Menu {
             this.usuarioLogueado = null;
         }
     }
-
-
-
-
 
 
     private void uiLoginAdmin() {
@@ -380,7 +370,7 @@ public class Menu {
         }
         for (Pelicula p : lista) {
             // Llama al nuevo método 'getDetalleCliente()' de Pelicula.java
-            System.out.println("• " + p.getDetalleCliente());
+            System.out.println("• " + p.getDetalleParaCartelera());
         }
     }
 
@@ -393,8 +383,8 @@ public class Menu {
             System.out.print("Título: ");
             String titulo = scanner.nextLine();
 
-            System.out.print("Genero (ACCION, COMEDIA, DRAMA, CIENCIA_FICCION): "); // Ajusta tus enums
-            Genero genero = Genero.valueOf(scanner.nextLine().toUpperCase());
+
+            Genero genero = uiSeleccionarGenero();
 
             System.out.print("Duración (minutos): ");
             int duracion = Integer.parseInt(scanner.nextLine());
@@ -444,12 +434,26 @@ public class Menu {
             System.out.print("Ingrese el ID de la Sala: ");
             String idSala = scanner.nextLine();
 
-            // 3. Pedir Fecha y Hora
-            System.out.print("Ingrese Fecha y Hora (Formato AAAA-MM-DDTHH:MM, ej: 2025-11-20T19:30): ");
-            String fechaHoraStr = scanner.nextLine();
-            LocalDateTime fechaHora = LocalDateTime.parse(fechaHoraStr); // Lanza DateTimeParseException
+            System.out.println("\n--- Programar Horario ---");
 
-            gestorDeCatalogo.crearFuncion(idPelicula, idSala, fechaHora);
+            // Pedimos la FECHA
+            System.out.print("Ingrese Fecha (Formato DD/MM/AAAA): ");
+            String fechaStr = scanner.nextLine();
+            // Creamos un formateador para "Día/Mes/Año"
+            DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate fecha = LocalDate.parse(fechaStr, formatoFecha);
+
+            // Pedimos la HORA
+            System.out.print("Ingrese Hora (Formato HH:MM, 24hs): ");
+            String horaStr = scanner.nextLine();
+            // Creamos un formateador para "Hora:Minuto"
+            DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm");
+            LocalTime hora = LocalTime.parse(horaStr, formatoHora);
+
+            // Combinamos la fecha y la hora en un solo objeto
+            LocalDateTime fechaHoraCompleta = LocalDateTime.of(fecha, hora);
+
+            gestorDeCatalogo.crearFuncion(idPelicula, idSala, fechaHoraCompleta);
             System.out.println("¡Función creada con éxito!");
 
         } catch (DateTimeParseException e) {
@@ -466,8 +470,8 @@ public class Menu {
     private void uiCrearReserva() {
         System.out.println("\n--- Comprar Entrada ---");
 
-        // 1. OBTENEMOS LA LISTA DE FUNCIONES (el "cerebro" no cambia)
-        ArrayList<Funcion> funcionesDisponibles = gestorDeCatalogo.getListaFunciones();
+        // 1. OBTENEMOS LA LISTA DE FUNCIONES
+        ArrayList<Funcion> funcionesDisponibles = gestorDeCatalogo.getFuncionesDisponiblesParaVenta();
 
         if (funcionesDisponibles.isEmpty()) {
             System.out.println("No hay funciones programadas.");
@@ -475,7 +479,7 @@ public class Menu {
             return;
         }
 
-        // 2. MOSTRAMOS LA LISTA CON NÚMEROS (la "mejora" de la UI)
+        // 2. MOSTRAMOS LA LISTA CON NÚMEROS
         System.out.println("--- Listado de Funciones ---");
 
         // Usamos un bucle 'for i' para poder tener un índice numérico
@@ -489,13 +493,13 @@ public class Menu {
                 detalle = "Error al cargar detalle de función " + f.getId();
             }
 
-            // ¡La Magia! Imprimimos (i + 1)
+            //  (i + 1) porque el array empieza desde 0 y no queremos eso para el usuario
             System.out.printf("[%d] %s\n", (i + 1), detalle);
             System.out.println("-----");
         }
 
         try {
-            // 3. PEDIMOS EL NÚMERO (ej: 1, 2, 3...)
+            // 3. se pide  el numero (ej: 1, 2, 3...)
             System.out.print("Seleccione el número [#] de la Función que desea: ");
             int seleccion = Integer.parseInt(scanner.nextLine());
 
@@ -506,19 +510,33 @@ public class Menu {
             }
 
             // 4. TRADUCIMOS EL NÚMERO AL OBJETO REAL
-            // (seleccion - 1 porque los Arrays empiezan en 0)
             Funcion funcionElegida = funcionesDisponibles.get(seleccion - 1);
-            String idFuncion = funcionElegida.getId(); // <-- Obtenemos el "b9a5d1c4"
+            String idFuncion = funcionElegida.getId(); // <-- Obtenemos el "b9a5d1c4" por ejemplo
 
 
-            // 5. Mostrar Asientos
-            System.out.println("Asientos Ocupados: " + funcionElegida.getAsientosOcupados().toString());
-            System.out.println("Asientos Disponibles: " + funcionElegida.getAsientosDisponibles());
+            System.out.println("--- Las butacas ocupadas se veran con la cruz ---");
+            Sala sala = gestorDeCatalogo.buscarSala(funcionElegida.getIdSala());
 
+// Hacemos un bucle de 1 hasta la capacidad total
+            for (int i = 1; i <= sala.getCapacidadTotal(); i++) {
+
+                // Chequeamos si el asiento 'i' está en la lista de ocupados
+                if (funcionElegida.isAsientoOcupado(i)) {
+                    System.out.print("[ X ] "); // Ocupado
+                } else {
+                    System.out.printf("[%2d] ", i); // Disponible (con formato)
+                }
+
+                // Para que se vea como un cine (ej. 10 asientos por fila)
+                if (i % 10 == 0) {
+                    System.out.println("\n"); // Salto de línea
+                }
+            }
+            System.out.println("\n------------------------");
             System.out.print("Ingrese el Número de Asiento (ej: 5): ");
             int numAsiento = Integer.parseInt(scanner.nextLine());
 
-            // --- ¡NUEVA LÓGICA PARA EL MENÚ! ---
+
             // 6. El Menú ahora debe buscar la película para saber el precio
             Pelicula pelicula = gestorDeCatalogo.buscarPelicula(funcionElegida.getIdPelicula());
             double precioACobrar = pelicula.getPrecioBase();
@@ -526,8 +544,16 @@ public class Menu {
 
             System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
 
+            if (sala.isEs3D()) {
+                double recargo = precioACobrar * 0.25; // 25% de recargo
+                precioACobrar += recargo;
+                System.out.printf("Info: Se aplicó un recargo de $%.2f por ser Sala 3D.\n", recargo);
+            }
+            // --- FIN DE LA LÓGICA DE PRECIO ---
 
-            // --- ¡AQUÍ ESTÁ LA VALIDACIÓN QUE PEDISTE! ---
+            System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
+
+
             String confirmacion = "";
             boolean entradaValida = false;
 
@@ -565,6 +591,7 @@ public class Menu {
             System.err.println("Error al crear la reserva: " + e.getMessage());
         }
     }
+
     private void uiVerMisReservas() {
         System.out.println("\n--- Mis Reservas ---");
         // El Gestor de Ventas filtra las reservas por el ID del cliente logueado
@@ -578,7 +605,7 @@ public class Menu {
         // Por cada reserva, pedimos el ticket detallado
         for (Reserva r : misReservas) {
             try {
-                String ticket = gestorDeVentas.getTicketDetallado(r.getId());
+                String ticket = gestorDeVentas.getTicketDetalladoCliente(r.getId(), this.usuarioLogueado.getNombre());
                 System.out.println(ticket);
                 System.out.println("--------------------");
             } catch (Exception e) {
@@ -697,4 +724,26 @@ public class Menu {
             System.err.println("Error al procesar el pago: " + e.getMessage());
         }
     }
+
+    private Genero uiSeleccionarGenero() {
+        System.out.println("Seleccione un Género:");
+        int i = 1;
+        // Itera sobre TODOS los valores del Enum Genero
+        for (Genero g : Genero.values()) {
+            System.out.printf("[%d] %s\n", i, g.name());
+            i++;
+        }
+
+        while (true) { // Bucle hasta que elija bien
+            try {
+                System.out.print("Seleccione el número [#]: ");
+                int seleccion = Integer.parseInt(scanner.nextLine());
+                return Genero.values()[seleccion - 1]; // Devuelve el Enum
+            } catch (Exception e) {
+                System.err.println("Error: Selección no válida.");
+            }
+        }
+    }
+
+
 }

@@ -25,17 +25,6 @@ public class JsonUtiles {
         }
     }
 
-    public static void grabarUnJson(JSONObject jsonObject, String archivo){
-        try {
-            FileWriter file = new FileWriter(archivo);
-            file.write(jsonObject.toString(4));
-            file.close();
-        } catch (IOException | JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-
     public static JSONTokener leerUnJson(String archivo) {
         JSONTokener tokener = null;
 
@@ -49,18 +38,5 @@ public class JsonUtiles {
         return tokener;
     }
 
-    //Otra forma
-    public static String leer(String archivo)
-    {
-        String contenido = "";
-        try
-        {
-            contenido = new String(Files.readAllBytes(Paths.get(archivo+".json")));
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return contenido;
-    }
+
 }

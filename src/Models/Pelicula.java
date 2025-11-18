@@ -109,7 +109,7 @@ public class Pelicula implements ItoJson, IIdentificable {
         return j ;
     }
 
-    public String getDetalleCliente() {
+    public String getDetalleParaCartelera() {
         String tituloStr = (this.titulo != null) ? this.titulo : "Sin Título";
         String generoStr = (this.genero != null) ? this.genero.name() : "Sin Género";
 

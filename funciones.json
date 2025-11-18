@@ -16,7 +16,11 @@
         "capacidadTotal": 80
     },
     {
-        "asientosOcupados": [5],
+        "asientosOcupados": [
+            5,
+            45,
+            12
+        ],
         "horario": "2025-11-20T11:30",
         "id": "eb5a67b7",
         "idPelicula": "667566a1",
@@ -30,5 +34,13 @@
         "idPelicula": "667566a1",
         "idSala": "d6103f6b",
         "capacidadTotal": 80
+    },
+    {
+        "asientosOcupados": [],
+        "horario": "2025-11-19T15:30",
+        "id": "010679bd",
+        "idPelicula": "6c6669df",
+        "idSala": "10a6b4cb",
+        "capacidadTotal": 100
     }
 ]

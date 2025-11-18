@@ -12,7 +12,6 @@ import java.util.HashMap;
 
 public class RepositorioUsuario <T extends Usuario>   {
     private HashMap<String, T> usuarios = new HashMap<>();
-    private static final String ARCHIVO_USUARIOS = "usuarios.json";
     public RepositorioUsuario() {
 
     }

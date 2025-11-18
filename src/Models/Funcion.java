@@ -51,16 +51,10 @@ public class Funcion implements ItoJson, IIdentificable {
         return horario;
     }
 
-    public int getCapacidadTotal() {
-        return capacidadTotal;
-    }
+
 
     public int getAsientosDisponibles() {
         return capacidadTotal - asientosOcupados.size();
-    }
-
-    public ArrayList<Integer> getAsientosOcupados() {
-        return asientosOcupados;
     }
 
     // --- MÉTODOS DE LÓGICA (para el Gestor) ---
@@ -157,13 +151,4 @@ public class Funcion implements ItoJson, IIdentificable {
         return f;
     }
 
-
-    //    public String mostrarDetalleFuncion() {
-    //        return ("🎬 FUNCION DETALLE 🎬")+
-    //        ("Pelicula: " + (pelicula != null ? pelicula.getTitulo() : "No asignada"))+
-    //        ("Sala: " + (sala != null ? sala.getNumSala() : "No asignada"))+
-    //      ("Horario: " + horario)+
-    //      ("Butacas ocupadas: " + butacaOcupadas.size())+
-    //      ("Butacas disponibles: " + butacasDisponibles());
-    //    }
 }

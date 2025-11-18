@@ -18,9 +18,6 @@ public class RepositorioReserva {
         elementosReserva.agregarElemento(r);
     }
 
-    public void eliminarReserva(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
-        elementosReserva.eliminarElemento(id);
-    }
 
     public Reserva buscarReserva(String id) throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
         return elementosReserva.buscarElemento(id);
@@ -31,7 +28,7 @@ public class RepositorioReserva {
     }
 
     // Método para que el Gestor guarde en JSON
-    public JSONArray ArregloDeReservas() {
+    public JSONArray arregloDeReservasJson() {
         JSONArray jsonArray = new JSONArray();
         for (Reserva r : elementosReserva.getElementos()) {
             jsonArray.put(r.toJson());

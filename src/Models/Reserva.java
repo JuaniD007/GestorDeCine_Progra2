@@ -72,13 +72,6 @@ public class Reserva implements ItoJson, IIdentificable {
         this.precioTotal = precioTotal;
     }
 
-    public boolean marcarComoPagado() {
-        if (!this.pagado) {
-            this.pagado = true;
-            return true;
-        }
-        return false;
-    }
 
     // 6. Equals/HashCode (necesarios para GestionDeRepositorio)
     @Override

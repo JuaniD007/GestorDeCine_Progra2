@@ -57,7 +57,7 @@ public class GestorUsuario {
                 }
 
                 if (usuario != null) {
-                    // Rellena el objeto usando tu método estático (Paso Previo 1)
+                    // Rellena el objeto usando el método estático (Paso Previo 1)
                     usuario = Usuario.traerDesdeJson(usuario, obj);
                     repoUsuario.agregarUsuario(usuario); // Agrega a memoria
                 }
@@ -89,17 +89,17 @@ public class GestorUsuario {
 
     /**
      * Método PÚBLICO para guardar el estado actual del repositorio en el JSON.
-     * Usa tu JsonUtiles.grabarUnJson
+     * Usa  JsonUtiles.grabarUnJson
      */
     public void guardarDatos() {
         JSONArray jsonArray = new JSONArray();
 
-        // 2. Usa el método getUsuarios() que agregaste en el Repositorio (Paso Previo 3)
+        // 2. Usa el método getUsuarios() que se agrego en el Repositorio (Paso Previo 3)
         for (Usuario usuario : repoUsuario.getUsuarios().values()) {
             jsonArray.put(usuario.toJson());
         }
 
-        // 3. Llama a tu método exacto de JsonUtiles
+        // 3. Llama al método exacto de JsonUtiles
         JsonUtiles.grabarUnJson(jsonArray, ARCHIVO_USUARIOS);
     }
 
@@ -193,9 +193,4 @@ public class GestorUsuario {
         }
     }
 
-    // (Necesario para que el Menu obtenga el objeto)
-
-    public Usuario buscarUsuarioPorDni(String dni) {
-        return repoUsuario.buscarUsuarioPorDni(dni.trim());
-    }
 }

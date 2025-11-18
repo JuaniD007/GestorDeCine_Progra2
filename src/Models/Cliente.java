@@ -13,20 +13,10 @@ import java.util.Objects;
 // NO guarda la lista de reservas.
 public class Cliente extends Usuario implements ItoJson {
 
-    // (El ArrayList<Reserva> se elimina)
-
-
 
     public Cliente(String nombre, String dni, int edad, String email, String contrasenia) {
         super(nombre, dni, edad, email, contrasenia);
     }
-
-    // Constructor vacío para JSON
-    public Cliente() {
-        super("", "", 0, "","");
-    }
-
-    // (Los getters/setters de reservaArrayList se eliminan)
 
     @Override
     public String toString() {
@@ -47,13 +37,4 @@ public class Cliente extends Usuario implements ItoJson {
     }
 
 
-    public static Cliente traerJSon(JSONObject o) {
-        Cliente c = new Cliente();
-
-        // Llama al método estático de Usuario para rellenar los datos
-        Usuario.traerDesdeJson(c, o);
-
-        // Ya no necesita cargar la lista de reservas (eso lo hará el GestorDeVentas)
-        return c;
-    }
 }

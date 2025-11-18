@@ -12,7 +12,6 @@ import Excepciones.*;
 // Importaciones de Utilidades y JSON
 import ModelsJson.JsonUtiles;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -131,32 +130,6 @@ public class GestorDeVentas {
      * Refactorización de tu método "generarTicket()".
      * Ahora el GESTOR busca los IDs y arma el String.
      */
-    public String getTicketDetallado(String idReserva)
-            throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
-
-        // 1. Buscar los 4 objetos
-        Reserva reserva = repoReservas.buscarReserva(idReserva);
-        Funcion funcion = gestorCatalogo.buscarFuncion(reserva.getIdFuncion());
-        Pelicula pelicula = gestorCatalogo.buscarPelicula(funcion.getIdPelicula());
-        Sala sala = gestorCatalogo.buscarSala(funcion.getIdSala());
-
-        // 2. Formatear
-        DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm 'hs'");
-
-        String ticket = "🎟️ TICKET DE RESERVA 🎟️\n" +
-                "  Código: " + reserva.getId() + "\n" +
-                "  Cliente: " + reserva.getIdCliente() + "\n" + // (Podríamos buscar el nombre del cliente)
-                "  Fecha Reserva: " + reserva.getFechaReserva().format(formatoFecha) + "\n" +
-                "  ------------------\n" +
-                "  Pelicula: " + pelicula.getTitulo() + "\n" +
-                "  Sala: " + sala.getNumSala() + "\n" +
-                "  Horario: " + funcion.getHorario().format(formatoHora) + " (" + funcion.getHorario().format(formatoFecha) + ")\n" +
-                "  Asiento: " + reserva.getNumAsiento() + "\n" +
-                "  Pagado: " + (reserva.isPagado() ? "Sí" : "No");
-
-        return ticket;
-    }
 
     public String getTicketDetalladoCliente(String idReserva, String nombreCliente)
             throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
@@ -187,7 +160,7 @@ public class GestorDeVentas {
     // --- 4. MÉTODOS PRIVADOS DE CARGA/GUARDADO ---
 
     public void guardarReservas() {
-        JsonUtiles.grabarUnJson(repoReservas.ArregloDeReservas(), ARCHIVO_RESERVAS);
+        JsonUtiles.grabarUnJson(repoReservas.arregloDeReservasJson(), ARCHIVO_RESERVAS);
     }
 
     private void cargarReservas() {

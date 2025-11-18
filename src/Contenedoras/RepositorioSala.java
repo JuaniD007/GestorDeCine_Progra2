@@ -29,7 +29,7 @@ public class RepositorioSala {
     }
 
     // Método para que el Gestor guarde en JSON
-    public JSONArray ArregloDeSalas() {
+    public JSONArray arregloDeSalasJson() {
         JSONArray jsonArray = new JSONArray();
         for (Sala s : elementosSala.getElementos()) {
             jsonArray.put(s.toJson());

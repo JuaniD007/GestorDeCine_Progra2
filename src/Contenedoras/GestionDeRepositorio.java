@@ -33,7 +33,7 @@ public class GestionDeRepositorio<T extends IIdentificable> {
             throw new ElementoRepetido("Error: Ya existe un elemento con ID " + objeto.getId());
 
         } catch (ElementoNoExiste e) {
-            // 3. Si lanza ElementoNoExiste, ¡perfecto! Lo agregamos.
+            // 3. Si lanza ElementoNoExiste, Lo agregamos.
             return this.elementos.add(objeto);
         }
         // (El catch de VerificarNulo y ElementoRepetido de buscarElemento se propagan solos)
@@ -46,9 +46,9 @@ public class GestionDeRepositorio<T extends IIdentificable> {
         }
 
         T elementoBuscar = null;
-        int contador = 0; // Para tu chequeo de duplicados (aunque agregarElemento ya no lo permite)
+        int contador = 0;
 
-        // --- LÓGICA LIMPIA ---
+
         for (T buscado : this.elementos) {
             if (buscado.getId().equals(id)) { // <-- Sin 'instanceof'
                 if (elementoBuscar == null) {
@@ -57,7 +57,6 @@ public class GestionDeRepositorio<T extends IIdentificable> {
                 contador++;
             }
         }
-        // --- FIN LÓGICA LIMPIA ---
 
         if (contador > 1) {
             throw new ElementoRepetido("Error: Se encontraron " + contador + " elementos con el ID " + id);

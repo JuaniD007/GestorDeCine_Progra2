@@ -2,7 +2,7 @@ package Models;
 
 import java.util.regex.Pattern;
 
-public class Validaciones {
+public abstract class Validaciones {
 
     public static boolean isStringValido(String texto) {
 

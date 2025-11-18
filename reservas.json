@@ -38,5 +38,25 @@
         "estadoReserva": true,
         "precioTotal": 4000,
         "fechaReserva": "2025-11-16"
+    },
+    {
+        "pagado": true,
+        "idCliente": "ce128173",
+        "idFuncion": "eb5a67b7",
+        "numAsiento": 45,
+        "id": "4dede071",
+        "estadoReserva": true,
+        "precioTotal": 7500,
+        "fechaReserva": "2025-11-16"
+    },
+    {
+        "pagado": true,
+        "idCliente": "ce128173",
+        "idFuncion": "eb5a67b7",
+        "numAsiento": 12,
+        "id": "96fd2d12",
+        "estadoReserva": true,
+        "precioTotal": 9375,
+        "fechaReserva": "2025-11-17"
     }
 ]

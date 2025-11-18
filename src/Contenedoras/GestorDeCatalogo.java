@@ -1,15 +1,18 @@
 package Contenedoras;
+
 import Models.*;
 import Excepciones.*;
 import Enum.Genero;
 import ModelsJson.JsonUtiles;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.time.format.DateTimeFormatter;
+
+
 public class GestorDeCatalogo {
 
     // --- 1. ATRIBUTOS (Maneja 3 repositorios) ---
@@ -68,7 +71,7 @@ public class GestorDeCatalogo {
             throw new ValidacionException("Ya existe una película con el título: " + titulo);
         }
 
-        Pelicula nueva = new Pelicula(duracion, genero,  precioBase ,titulo);
+        Pelicula nueva = new Pelicula(duracion, genero, precioBase, titulo);
         repoPeliculas.agregarPelicula(nueva);
         guardarPeliculas(); // Persiste el cambio en el JSON
     }
@@ -111,7 +114,7 @@ public class GestorDeCatalogo {
             throw new ValidacionException("Ya existe una sala con el número " + numSala);
         }
 
-        Sala nueva = new Sala(numSala,  capacidad, es3D);
+        Sala nueva = new Sala(numSala, capacidad, es3D);
         repoSalas.agregarSala(nueva);
         guardarSalas(); // Persiste el cambio en el JSON
     }
@@ -226,11 +229,13 @@ public class GestorDeCatalogo {
 
     // --- Métodos de Guardado ---
     public void guardarPeliculas() {
-        JsonUtiles.grabarUnJson(repoPeliculas.ArregloDePeliculas(), ARCHIVO_PELICULAS);
+        JsonUtiles.grabarUnJson(repoPeliculas.arregloDePeliculasJson(), ARCHIVO_PELICULAS);
     }
+
     public void guardarSalas() {
-        JsonUtiles.grabarUnJson(repoSalas.ArregloDeSalas(), ARCHIVO_SALAS);
+        JsonUtiles.grabarUnJson(repoSalas.arregloDeSalasJson(), ARCHIVO_SALAS);
     }
+
     public void guardarFunciones() {
         JsonUtiles.grabarUnJson(repoFunciones.ArregloDeFunciones(), ARCHIVO_FUNCIONES);
     }
@@ -246,7 +251,9 @@ public class GestorDeCatalogo {
                     Pelicula p = Pelicula.traerDesdeJson(obj);
                     repoPeliculas.agregarPelicula(p);
                 }
-            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_PELICULAS + " corrupto o error al cargar."); }
+            } catch (Exception e) {
+                System.err.println("ALERTA: " + ARCHIVO_PELICULAS + " corrupto o error al cargar.");
+            }
         }
     }
 
@@ -260,7 +267,9 @@ public class GestorDeCatalogo {
                     Sala s = Sala.traerDesdeJson(obj);
                     repoSalas.agregarSala(s);
                 }
-            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_SALAS + " corrupto o error al cargar."); }
+            } catch (Exception e) {
+                System.err.println("ALERTA: " + ARCHIVO_SALAS + " corrupto o error al cargar.");
+            }
         }
     }
 
@@ -274,7 +283,9 @@ public class GestorDeCatalogo {
                     Funcion f = Funcion.traerDesdeJson(obj);
                     repoFunciones.agregarFuncion(f);
                 }
-            } catch (Exception e) { System.err.println("ALERTA: " + ARCHIVO_FUNCIONES + " corrupto o error al cargar."); }
+            } catch (Exception e) {
+                System.err.println("ALERTA: " + ARCHIVO_FUNCIONES + " corrupto o error al cargar.");
+            }
         }
     }
 
@@ -282,6 +293,7 @@ public class GestorDeCatalogo {
      * Recibe el ID de una función y devuelve un String "bonito"
      * con los detalles (título, sala, hora) conectando los repositorios.
      * * @param idFuncion El ID de la función a detallar.
+     *
      * @return Un String formateado con los detalles.
      * @throws ElementoNoExiste Si la función, película o sala no se encuentran.
      */
@@ -309,5 +321,18 @@ public class GestorDeCatalogo {
         return detalle;
     }
 
+
+    public ArrayList<Funcion> getFuncionesDisponiblesParaVenta() {
+        ArrayList<Funcion> filtradas = new ArrayList<>();
+        LocalDateTime ahora = LocalDateTime.now();
+
+        for (Funcion f : repoFunciones.getListaFunciones()) {
+            // Si la hora de la función es DESPUÉS de la hora actual...
+            if (f.getHorario().isAfter(ahora)) {
+                filtradas.add(f);
+            }
+        }
+        return filtradas;
+    }
 
 }
