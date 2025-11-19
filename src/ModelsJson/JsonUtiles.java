@@ -1,17 +1,12 @@
 package ModelsJson;
-
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONTokener;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 public class JsonUtiles {
 

@@ -23,7 +23,7 @@ public class GestorDeVentas {
 
     // --- 1. ATRIBUTOS ---
     private RepositorioReserva repoReservas;
-    private GestorDeCartelera gestorCartelera; // <-- ¡El acoplamiento clave!
+    private GestorDeCartelera gestorCartelera;
 
     private static final String ARCHIVO_RESERVAS = "reservas.json";
 
@@ -66,7 +66,7 @@ public class GestorDeVentas {
         // A. Marcamos el asiento como ocupado en la Función
         funcion.ocuparAsiento(numAsiento);
 
-        // B. ¡IMPORTANTE! Guardamos el cambio en el archivo de funciones
+        // B.  Guardamos el cambio en el archivo de funciones
         gestorCartelera.guardarFunciones();
 
         // C. Creamos la nueva reserva
@@ -145,7 +145,6 @@ public class GestorDeVentas {
         DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter formatoHora = DateTimeFormatter.ofPattern("HH:mm 'hs'");
 
-        // 3. Armar el String (¡SIN IDs!)
         String ticket = "🎟️ TICKET DE RESERVA 🎟️\n" +
                 "  Cliente: " + nombreCliente + "\n" +
                 "  Película: " + pelicula.getTitulo() + "\n" +
@@ -188,7 +187,7 @@ public class GestorDeVentas {
         for (Reserva r : listaTotalReservas) {
 
             // Comprobamos si la reserva es de esa función Y si está activa
-            // (Asumimos que la reserva tiene un getter 'isEstadoReserva()')
+
             if (r.getIdFuncion().equals(idFuncion) && r.isEstadoReserva()) {
 
                 // Encontró una Es peligroso borrar.

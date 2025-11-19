@@ -40,5 +40,61 @@
         "titulo": "Gitano",
         "duracion": 110,
         "idPelicula": "15504b02"
+    },
+    {
+        "precioBase": 4500,
+        "genero": "DRAMA",
+        "titulo": "El Padrino",
+        "duracion": 175,
+        "idPelicula": "a1b2c3d4"
+    },
+    {
+        "precioBase": 3800,
+        "genero": "ANIMADA",
+        "titulo": "Toy Story",
+        "duracion": 81,
+        "idPelicula": "e5f67890"
+    },
+    {
+        "precioBase": 4200,
+        "genero": "TERROR",
+        "titulo": "It (Eso)",
+        "duracion": 135,
+        "idPelicula": "b9a8c7d6"
+    },
+    {
+        "precioBase": 5000,
+        "genero": "ACCION",
+        "titulo": "Avengers Endgame",
+        "duracion": 181,
+        "idPelicula": "f1e2d3c4"
+    },
+    {
+        "precioBase": 3500,
+        "genero": "SUSPENSO",
+        "titulo": "La Isla Siniestra",
+        "duracion": 138,
+        "idPelicula": "99887766"
+    },
+    {
+        "precioBase": 2800,
+        "genero": "COMEDIA",
+        "titulo": "Superbad",
+        "duracion": 113,
+        "idPelicula": "ccdd4455"
+    },
+    {
+        "precioBase": 4100,
+        "genero": "TERROR",
+        "titulo": "El Conjuro",
+        "duracion": 112,
+        "idPelicula": "aa22bb33"
+    },
+    {
+        "precioBase": 3200,
+        "genero": "ANIMADA",
+        "titulo": "Shrek 2",
+        "duracion": 93,
+        "idPelicula": "77441122"
     }
 ]

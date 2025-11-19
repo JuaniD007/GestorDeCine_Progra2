@@ -20,6 +20,15 @@
     {
         "tipo": "Cliente",
         "contrasenia": "1234",
+        "id": "40669070",
+        "nombre": "Prueba",
+        "edad": 33,
+        "dni": "12345",
+        "email": "lalala@gmal.com"
+    },
+    {
+        "tipo": "Cliente",
+        "contrasenia": "1234",
         "id": "5d0d63f0",
         "nombre": "Johana",
         "edad": 21,

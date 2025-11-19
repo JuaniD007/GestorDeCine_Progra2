@@ -8,11 +8,6 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 import Excepciones.*;
 
-import javax.print.attribute.standard.JobSheets;
-import java.util.regex.Pattern;
-
-// Se elimina la importación de Scanner ya que no se usa para leer entrada
-// en esta versión refactorizada de la clase de lógica.
 
 public class GestorUsuario {
     private RepositorioUsuario<Usuario> repoUsuario = new RepositorioUsuario<>();
@@ -23,7 +18,7 @@ public class GestorUsuario {
         // Intenta leer el archivo usando el método
         JSONTokener tokener = JsonUtiles.leerUnJson(ARCHIVO_USUARIOS);
 
-        // 2. Comprueba si el archivo NO existía (tu método devuelve null)
+        // 2. Comprueba si el archivo NO existía
         if (tokener == null) {
             crearAdminPorDefecto(); // Crea el admin y guarda el archivo
         } else {
@@ -47,10 +42,9 @@ public class GestorUsuario {
         for (int i = 0; i < jsonArray.length(); i++) {
             try {
                 JSONObject obj = jsonArray.getJSONObject(i);
-                String tipo = obj.getString("tipo"); // <-- Paso Previo 2
+                String tipo = obj.getString("tipo");
                 Usuario usuario = null;
 
-                // Fábrica para decidir qué clase instanciar
                 if (tipo.equals("Administrador")) {
                     usuario = new Administrador("", "", 0, "", ""); // Objeto temporal
                 } else if (tipo.equals("Cliente")) {
@@ -58,7 +52,6 @@ public class GestorUsuario {
                 }
 
                 if (usuario != null) {
-                    // Rellena el objeto usando el método estático (Paso Previo 1)
                     usuario = Usuario.traerDesdeJson(usuario, obj);
                     repoUsuario.agregarUsuario(usuario); // Agrega a memoria
                 }
@@ -160,7 +153,7 @@ public class GestorUsuario {
         // --- 4. PERSISTIR ---
         guardarDatos();
 
-        // Si llega aquí, todo salió bien (no devuelve nada)
+        // Si llega aca, todo salió bien (no devuelve nada)
     }
 
     /**

@@ -6,13 +6,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.time.LocalDate;
-import java.util.Objects; // <-- Importado
-import java.util.UUID;    // <-- Importado
+import java.util.Objects;
+import java.util.UUID;
 
-// 1. Implementa IIdentificable (para usarla en GestionDeRepositorio)
 public class Reserva implements ItoJson, IIdentificable {
 
-    // 2. ID unificado (en lugar de idReserva)
+
     private String id;
 
     // 3. IDs en lugar de Objetos (evita el bucle infinito)
@@ -30,7 +29,7 @@ public class Reserva implements ItoJson, IIdentificable {
      * Auto-genera su propio ID.
      */
     public Reserva(String idCliente, String idFuncion, int numAsiento, LocalDate fechaReserva, boolean pagado, boolean estadoReserva, Double precioTotal) {
-        this.id = UUID.randomUUID().toString().substring(0, 8); // Auto-ID
+        this.id = UUID.randomUUID().toString().substring(0, 8);
         this.idCliente = idCliente;
         this.idFuncion = idFuncion;
         this.numAsiento = numAsiento;
@@ -73,7 +72,6 @@ public class Reserva implements ItoJson, IIdentificable {
     }
 
 
-    // 6. Equals/HashCode (necesarios para GestionDeRepositorio)
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -88,29 +86,8 @@ public class Reserva implements ItoJson, IIdentificable {
     }
 
 
-    // 7. MÉTODO QUE SE USARÁ EN OTRO LADO (COMENTADO)
-    /*
-     * << COMENTARIO PARA EL EQUIPO >>
-     * Este método 'generarTicket' ya NO PUEDE funcionar aca.
-     * La Reserva ya no conoce el objeto 'Funcion' (solo su ID).
-     * * Esta lógica AHORA le pertenece al 'GestorDeVentas' o al 'Menu'.
-     * Se creará un método en el gestor, por ejemplo:
-     * public String getTicketDetallado(String idReserva)
-     * * Ese método buscará la Reserva, la Funcion, la Pelicula y la Sala
-     * (usando los Gestores) para armar el String del ticket.
-     */
-    //    public String generarTicket() {
-    //        return "🎟️ TICKET DE RESERVA 🎟️\n" +
-    //                "Código: " + id + "\n" +
-    //                "Fecha reserva: " + fechaReserva + "\n" +
-    //                "Función: " + (funcion != null ? funcion.getPelicula().getTitulo() : "  ") + "\n" +
-    //                "Sala: " + (funcion != null ? funcion.getSala().getNumSala() : "  ") + "\n" +
-    //                "Asiento: " + numAsiento + "\n" +
-    //                "Pagado: " + (pagado ? "Sí" : "No") + "\n" +
-    //                "Estado: " + (estadoReserva ? "Activa" : "Cancelada");
-    //    }
 
-    // 8. toJson (Refactorizado para guardar IDs)
+
     @Override
     public JSONObject toJson() {
         JSONObject j = new JSONObject();
@@ -130,7 +107,6 @@ public class Reserva implements ItoJson, IIdentificable {
         return j;
     }
 
-    // 9. traerDesdeJson (Refactorizado)
     public static Reserva traerDesdeJson(JSONObject o) throws JSONException {
         Reserva r = new Reserva();
 

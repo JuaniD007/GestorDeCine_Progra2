@@ -15,7 +15,7 @@ import java.util.Scanner;
 
 public class Menu {
 
-    // --- Los 3 "Cerebros" (se reciben del Cine) ---
+    // --- Los 3 gestores que son los "cerebros" (se reciben del Cine) ---
     private GestorUsuario gestorUsuario;
     private GestorDeCartelera gestorDeCartelera;
     private GestorDeVentas gestorDeVentas;
@@ -73,7 +73,7 @@ public class Menu {
                     System.err.println("Opción no válida.");
             }
 
-            // Si el login fue exitoso (en case 1 o 3), se entra al menú correspondiente
+            // Si el login fue exitoso (en caso 1 o 3), se entra al menú correspondiente
             if (this.usuarioLogueado != null) {
                 if (this.usuarioLogueado instanceof Administrador) {
                     mostrarMenuAdmin(); // Bucle del menú de Admin
@@ -109,7 +109,8 @@ public class Menu {
             System.out.println("7. Eliminar Película");
             System.out.println("8. Eliminar Sala");
             System.out.println("9. Eliminar Función");
-            System.out.println("\n10. Cerrar Sesión");
+            System.out.println("\n10. Modificar Peliciula");
+            System.out.println("\n11. Cerrar Sesión");
             System.out.print("Seleccione una opción: ");
             try {
                 opcion = Integer.parseInt(scanner.nextLine());
@@ -151,6 +152,9 @@ public class Menu {
                     break;
 
                 case 10:
+                     uiModificarPelicula();
+                    break;
+                case 11:
                     System.out.println("Cerrando sesión de administrador...");
                     break;
                 default:
@@ -196,6 +200,63 @@ public class Menu {
             System.err.println("Error al eliminar la sala: " + e.getMessage());
         }
     }
+
+    private void uiModificarPelicula() {
+        System.out.println("\n--- Modificar Película ---");
+        uiListarPeliculas(); // Mostramos la lista para ver IDs y datos actuales
+
+        System.out.print("Ingrese el ID de la película a modificar: ");
+        String id = scanner.nextLine();
+
+        try {
+            // 1. Buscamos la película solo para mostrarle al admin qué está editando
+            // (El gestor busca de nuevo, pero esto es para la UI)
+            Pelicula p = gestorDeCartelera.buscarPelicula(id);
+
+            System.out.println("Editando: " + p.getTitulo());
+            System.out.println("(Presione ENTER para mantener el valor actual)");
+
+
+            System.out.print("Nuevo Título [" + p.getTitulo() + "]: ");
+            String nuevoTitulo = scanner.nextLine();
+            if (nuevoTitulo.trim().isEmpty()) nuevoTitulo = null;
+
+
+            System.out.println("Actual: " + p.getGenero());
+            System.out.print("¿Desea cambiar el género? (S/N): ");
+            String cambiarGenero = scanner.nextLine();
+            Genero nuevoGenero = null;
+            if (cambiarGenero.equalsIgnoreCase("S")) {
+                nuevoGenero = uiSeleccionarGenero();
+            }
+
+
+            System.out.print("Nueva Duración [" + p.getDuracion() + " min]: ");
+            String duracionStr = scanner.nextLine();
+            int nuevaDuracion = -1; // Valor "ignorar"
+            if (!duracionStr.trim().isEmpty()) {
+                nuevaDuracion = Integer.parseInt(duracionStr);
+            }
+
+
+            System.out.print("Nuevo Precio [$" + p.getPrecioBase() + "]: ");
+            String precioStr = scanner.nextLine();
+            double nuevoPrecio = -1; // Valor "ignorar"
+            if (!precioStr.trim().isEmpty()) {
+                nuevoPrecio = Double.parseDouble(precioStr);
+            }
+
+            gestorDeCartelera.modificarPelicula(id, nuevoTitulo, nuevoGenero, nuevaDuracion, nuevoPrecio);
+            System.out.println("¡Película modificada con éxito!");
+
+        } catch (NumberFormatException e) {
+            System.err.println("Error: Debe ingresar números válidos.");
+        } catch (Exception e) {
+            System.err.println("Error al modificar: " + e.getMessage());
+        }
+    }
+
+
 
     /**
      * Pide un ID de Función y llama al gestor para eliminarla.
@@ -465,12 +526,11 @@ public class Menu {
 
     // --- UIs de CLIENTE ---
 
-    // En Menu.java
 
     private void uiCrearReserva() {
         System.out.println("\n--- Comprar Entrada ---");
 
-        // 1. OBTENEMOS LA LISTA DE FUNCIONES
+        // 1. aGarramosd La lista de funciones
         ArrayList<Funcion> funcionesDisponibles = gestorDeCartelera.getFuncionesDisponiblesParaVenta();
 
         if (funcionesDisponibles.isEmpty()) {
@@ -479,7 +539,7 @@ public class Menu {
             return;
         }
 
-        // 2. MOSTRAMOS LA LISTA CON NÚMEROS
+        // 2. mostramos la lista con numeros
         System.out.println("--- Listado de Funciones ---");
 
         // Usamos un bucle 'for i' para poder tener un índice numérico
@@ -487,7 +547,7 @@ public class Menu {
             Funcion f = funcionesDisponibles.get(i);
             String detalle = "";
             try {
-                // Obtenemos el detalle bonito (Ej: "Dune 2 | Sala 1...")
+                // agarramos el detalle bonito (Ej: "Dune 2 | Sala 1...")
                 detalle = gestorDeCartelera.getDetalleFuncion(f.getId());
             } catch (Exception e) {
                 detalle = "Error al cargar detalle de función " + f.getId();
@@ -509,33 +569,29 @@ public class Menu {
                 return;
             }
 
-            // 4. TRADUCIMOS EL NÚMERO AL OBJETO REAL
+            // 4. traducimos el numero a objeto real
             Funcion funcionElegida = funcionesDisponibles.get(seleccion - 1);
             String idFuncion = funcionElegida.getId(); // <-- Obtenemos el "b9a5d1c4" por ejemplo
 
 
             System.out.println("--- Las butacas ocupadas se veran con la cruz ---");
 
-// Hacemos un bucle de 1 hasta la capacidad total
-            // 4. MAPA DE ASIENTOS (VISUAL CENTRADO)
+            // 4. MAPA DE ASIENTOS
             Sala sala = gestorDeCartelera.buscarSala(funcionElegida.getIdSala());
 
             System.out.println("\n");
-            // Dibujo de la Pantalla (Centrado manual con espacios)
             System.out.println("                     ___________________________________");
             System.out.println("                    |        PANTALLA DEL CINE          |");
             System.out.println("                     ¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯");
             System.out.println("                                (FRENTE)\n");
 
             int asientosPorFila = 10;
-            String margenIzquierdo = "                "; // El "padding" para centrar los asientos
+            String margenIzquierdo = "                ";
 
-            // Imprimimos el margen de la primera fila
             System.out.print(margenIzquierdo);
 
             for (int i = 1; i <= sala.getCapacidadTotal(); i++) {
 
-                // Lógica visual: Ocupado vs Libre
                 if (funcionElegida.isAsientoOcupado(i)) {
                     System.out.print("[XX] "); // Ocupado (Marca visual clara)
                 } else {
@@ -557,10 +613,9 @@ public class Menu {
             int numAsiento = Integer.parseInt(scanner.nextLine());
 
 
-            // 6. El Menú ahora debe buscar la película para saber el precio
+            // 6. El Menú ahora tiene que buscar la película para saber el precio
             Pelicula pelicula = gestorDeCartelera.buscarPelicula(funcionElegida.getIdPelicula());
             double precioACobrar = pelicula.getPrecioBase();
-            // (Aquí podrías agregar lógica extra, ej: if (sala.is3D()) precioACobrar *= 1.25;)
 
             System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
 
@@ -569,7 +624,6 @@ public class Menu {
                 precioACobrar += recargo;
                 System.out.printf("Info: Se aplicó un recargo de $%.2f por ser Sala 3D.\n", recargo);
             }
-            // --- FIN DE LA LÓGICA DE PRECIO ---
 
             System.out.printf("El precio de esta entrada es: $%.2f\n", precioACobrar);
 
@@ -591,17 +645,16 @@ public class Menu {
                     System.err.println("Error: Por favor, ingrese solo 'S' o 'N'.");
                 }
             }
-            // --- FIN DE LA VALIDACIÓN ---
+
 
 
             // 7. VERIFICAR CONFIRMACIÓN
-            // Usamos .equalsIgnoreCase() para ser flexibles (acepta 's' o 'S')
             if (!confirmacion.equalsIgnoreCase("S")) {
                 System.out.println("Compra cancelada.");
                 return;
             }
 
-            // 6. Llama al Gestor de Ventas (usando el ID que encontramos)
+            // 6. Llama al Gestor de Ventas (usando el id que encontramos)
             gestorDeVentas.crearReserva(this.usuarioLogueado.getId(), idFuncion, numAsiento, precioACobrar);
             System.out.println("¡Reserva creada con éxito! (Pendiente de pago)");
 
@@ -675,7 +728,7 @@ public class Menu {
         }
         for (Funcion f : lista) {
             try {
-                // Pedimos al gestor que arme el detalle (esto es más lento pero más útil)
+                // Pedimos al gestor que arme el detalle
                 String detalle = gestorDeCartelera.getDetalleFuncion(f.getId());
                 System.out.println("ID: " + f.getId() + " | " + detalle);
                 System.out.println("-----");
@@ -712,7 +765,7 @@ public class Menu {
                     (i + 1),
                     r.getNumAsiento(),
                     detalle,
-                    r.getPrecioTotal() // <-- Mostramos el precio
+                    r.getPrecioTotal()
             );
             System.out.println("-----");
         }
@@ -734,7 +787,7 @@ public class Menu {
             // 5. Llamamos al Gestor para pagar
             double totalPagado = gestorDeVentas.pagarReserva(idReserva);
 
-            // 6. Mostramos el resultado (¡tu requisito!)
+            // 6. Mostramos el resultado
             System.out.println("\n¡Pago procesado con éxito!");
             System.out.printf("Total pagado: $%.2f\n", totalPagado);
 

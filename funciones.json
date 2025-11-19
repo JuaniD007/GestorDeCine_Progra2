@@ -63,5 +63,45 @@
         "idPelicula": "15504b02",
         "idSala": "411b75f6",
         "capacidadTotal": 50
+    },
+    {
+        "asientosOcupados": [10, 11, 12],
+        "horario": "2025-11-21T16:00",
+        "id": "f2a1b3c4",
+        "idPelicula": "1af4eece",
+        "idSala": "10a6b4cb",
+        "capacidadTotal": 100
+    },
+    {
+        "asientosOcupados": [50, 51, 99, 100],
+        "horario": "2025-11-21T20:00",
+        "id": "d4e5f6a7",
+        "idPelicula": "efb23ed0",
+        "idSala": "10a6b4cb",
+        "capacidadTotal": 100
+    },
+    {
+        "asientosOcupados": [],
+        "horario": "2025-11-22T14:00",
+        "id": "a1b2c3d4",
+        "idPelicula": "e5f67890",
+        "idSala": "10a6b4cb",
+        "capacidadTotal": 100
+    },
+    {
+        "asientosOcupados": [1, 2, 3, 4, 5],
+        "horario": "2025-11-22T18:30",
+        "id": "b9c8d7e6",
+        "idPelicula": "6c6669df",
+        "idSala": "10a6b4cb",
+        "capacidadTotal": 100
+    },
+    {
+        "asientosOcupados": [45, 46],
+        "horario": "2025-11-23T21:00",
+        "id": "f1e2d3c4",
+        "idPelicula": "a1b2c3d4",
+        "idSala": "10a6b4cb",
+        "capacidadTotal": 100
     }
 ]

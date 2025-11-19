@@ -50,7 +50,7 @@ public class GestionDeRepositorio<T extends IIdentificable> {
 
 
         for (T buscado : this.elementos) {
-            if (buscado.getId().equals(id)) { // <-- Sin 'instanceof'
+            if (buscado.getId().equals(id)) {
                 if (elementoBuscar == null) {
                     elementoBuscar = buscado;
                 }

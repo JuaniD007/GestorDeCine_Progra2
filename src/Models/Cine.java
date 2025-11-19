@@ -35,10 +35,10 @@ public class Cine {
         //    para poder buscar funciones, validar asientos, etc.
         this.gestorDeVentas = new GestorDeVentas(this.gestorDeCartelera);
 
+        // 5. Inicia la interfaz y le pasa los gestores para que los use
         this.menu = new Menu(gestorUsuario, gestorDeCartelera, gestorDeVentas);
 
-        // 5. Inicia la interfaz y le pasa los cerebros para que los use
-//        this.menu = new Menu(gestorUsuario, gestorDeCartelera, gestorDeVentas);
+
     }
 
     /**

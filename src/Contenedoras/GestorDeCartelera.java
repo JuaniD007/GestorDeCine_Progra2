@@ -38,7 +38,6 @@ public class GestorDeCartelera {
         cargarFunciones();
     }
 
-    // --- 3. MÉTODOS PÚBLICOS (La "API" para el Menú) ---
 
     // --- API de PELÍCULAS ---
 
@@ -65,8 +64,6 @@ public class GestorDeCartelera {
             throw new ValidacionException("Error: La duración debe ser un valor lógico (entre " + minDuracion + " y " + maxDuracion + " minutos).");
         }
 
-
-        // Validación de negocio (regla de duplicados)
         if (buscarPeliculaPorTitulo(titulo) != null) {
             throw new ValidacionException("Ya existe una película con el título: " + titulo);
         }
@@ -88,6 +85,44 @@ public class GestorDeCartelera {
         }
         return null; // No se encontró
     }
+
+    public void modificarPelicula (String id, String nuevoTitulo, Genero nuevoGenero, int nuevaDuracion, double nuevoPrecio)
+            throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
+
+            Pelicula p = repoPeliculas.buscarElemento(id);
+
+            if(nuevoTitulo != null && !nuevoTitulo.trim().isEmpty()) {
+
+                Pelicula peliAux = buscarPeliculaPorTitulo(nuevoTitulo);
+
+                if(peliAux != null  && !peliAux.getId().equals(id)) {
+
+                    throw new ElementoRepetido("El título " + nuevoTitulo + " ya está usado por otra película.");
+                }
+
+                    p.setTitulo(nuevoTitulo);
+
+            }
+
+        if (nuevoGenero != null) {
+            p.setGenero(nuevoGenero);
+        }
+
+
+        if (nuevaDuracion > 0) {
+            // Podrías validar rango aquí también
+            p.setDuracion(nuevaDuracion);
+        }
+
+
+        if (nuevoPrecio > 0) {
+            p.setPrecioBase(nuevoPrecio);
+        }
+
+        guardarPeliculas();
+
+    }
+
 
     public ArrayList<Pelicula> getListaPeliculas() {
         return repoPeliculas.getListaPeliculas();
@@ -141,7 +176,7 @@ public class GestorDeCartelera {
         guardarSalas();
     }
 
-    // --- API de FUNCIONES (Lógica de negocio principal) ---
+    //  API de FUNCIONES (Lógica de negocio principal)
 
     /**
      * Valida y crea una nueva función.
@@ -165,9 +200,8 @@ public class GestorDeCartelera {
         long duracionNueva = peliculaNueva.getDuracion(); // Ej: 120 minutos
         LocalDateTime finNueva = inicioNueva.plusMinutes(duracionNueva);
 
-        // --- 3. VALIDACIÓN DE LÓGICA (¡AQUÍ ESTÁ LA MAGIA!) ---
+        // --- 3. VALIDACIÓN DE LÓGICA
 
-        // Obtenemos todas las funciones que YA existen en esa sala
         ArrayList<Funcion> funcionesDeLaSala = buscarFuncionesPorSala(idSala);
 
         for (Funcion fExistente : funcionesDeLaSala) {
@@ -179,11 +213,6 @@ public class GestorDeCartelera {
             LocalDateTime inicioExistente = fExistente.getHorario();
             LocalDateTime finExistente = inicioExistente.plusMinutes(duracionExistente);
 
-            // --- Lógica de Superposición (Colisión) ---
-            // Un horario (A-B) se pisa con otro (C-D) si:
-            // (El inicio de A es antes del fin de D) Y (El fin de A es después del inicio de C)
-            // (A < D) && (B > C)
-
             if (inicioExistente.isBefore(finNueva) && finExistente.isAfter(inicioNueva)) {
 
                 throw new ValidacionException(
@@ -193,7 +222,7 @@ public class GestorDeCartelera {
         }
         // --- FIN DE LA VALIDACIÓN ---
 
-        // 4. Si el bucle 'for' termina sin lanzar excepción, el horario está libre.
+        // 4. Si el bucle for termina sin lanzar excepción, el horario está libre.
         Funcion nuevaFuncion = new Funcion(idPelicula, idSala, fechaHora, sala.getCapacidadTotal());
         repoFunciones.agregarFuncion(nuevaFuncion);
         guardarFunciones();
@@ -295,6 +324,7 @@ public class GestorDeCartelera {
      * @return Un String formateado con los detalles.
      * @throws ElementoNoExiste Si la función, película o sala no se encuentran.
      */
+
     public String getDetalleFuncion(String idFuncion)
             throws ElementoNoExiste, VerificarNulo, ElementoRepetido {
 
@@ -308,7 +338,6 @@ public class GestorDeCartelera {
         String horarioFormateado = funcion.getHorario().format(formato);
 
         // 3. Armar el String final (en un solo renglón para la lista)
-        // Ej: "🎬 Oppenheimer | Sala 3 | 20/11 a las 19:30 hs | 50 asientos disp."
         String detalle = String.format("🎬 %s | Sala %d | %s | %d asientos disp.",
                 pelicula.getTitulo(),
                 sala.getNumSala(),
@@ -326,7 +355,7 @@ public class GestorDeCartelera {
         LocalDateTime ahora = LocalDateTime.now();
 
         for (Funcion f : repoFunciones.getListaFunciones()) {
-            // Si la hora de la función es DESPUÉS de la hora actual...
+            // Si la hora de la función es DESPUÉS de la hora actual
             if (f.getHorario().isAfter(ahora)) {
                 filtradas.add(f);
             }
