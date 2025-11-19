@@ -22,7 +22,7 @@ Ejecuta la clase principal: Main.java. El sistema verificará automáticamente l
 3. Credenciales de Acceso (Admin)
 Para acceder a las funcionalidades de gestión, utiliza el siguiente usuario pre-cargado:
 
-DNI: 11111111
+DNI: 1111
 
 Contraseña: admin
 
